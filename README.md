@@ -117,7 +117,7 @@ curl -s -X POST \
   -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0OTQ4NjU1OTEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE0OTQ4NjE5OTF9.yWaJhFDuTvMQRaZIqg20Is5t-JJ_1BP58yrNLOKxtNI" \
   -H "content-type: application/json" \
   -d '{
-	"peers": ["localhost:7051","localhost:7056"]
+	"peers": ["localhost:7051","localhost:8051"]
 }'
 ```
 ### Install chaincode
@@ -128,7 +128,7 @@ curl -s -X POST \
   -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0OTQ4NjU1OTEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE0OTQ4NjE5OTF9.yWaJhFDuTvMQRaZIqg20Is5t-JJ_1BP58yrNLOKxtNI" \
   -H "content-type: application/json" \
   -d '{
-	"peers": ["localhost:7051","localhost:7056"],
+	"peers": ["localhost:7051","localhost:8051"],
 	"chaincodeName":"mycc",
 	"chaincodePath":"github.com/example_cc",
 	"chaincodeVersion":"v0"
@@ -159,7 +159,7 @@ curl -s -X POST \
   -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0OTQ4NjU1OTEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE0OTQ4NjE5OTF9.yWaJhFDuTvMQRaZIqg20Is5t-JJ_1BP58yrNLOKxtNI" \
   -H "content-type: application/json" \
   -d '{
-	"peers": ["localhost:7051", "localhost:7056"],
+	"peers": ["localhost:7051", "localhost:8051"],
 	"fcn":"invoke",
 	"args":["move","a","b","10"]
 }'
@@ -252,20 +252,20 @@ If you choose to customize your docker-compose yaml file by hardcoding IP Addres
 				...
 			},
 			"peer2": {
-				"requests": "grpcs://x.x.x.x:7056",
-				"events": "grpcs://x.x.x.x:7058",
+				"requests": "grpcs://x.x.x.x:8051",
+				"events": "grpcs://x.x.x.x:8053",
 				...
 			}
 		},
 		"org2": {
 			"ca": "http://x.x.x.x:8054",
 			"peer1": {
-				"requests": "grpcs://x.x.x.x:8051",
-				"events": "grpcs://x.x.x.x:8053",
+				"requests": "grpcs://x.x.x.x:9051",
+				"events": "grpcs://x.x.x.x:9053",
 				...			},
 			"peer2": {
-				"requests": "grpcs://x.x.x.x:8056",
-				"events": "grpcs://x.x.x.x:8058",
+				"requests": "grpcs://x.x.x.x:10051",
+				"events": "grpcs://x.x.x.x:10053",
 				...
 			}
 		}

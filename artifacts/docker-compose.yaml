@@ -85,8 +85,8 @@ services:
       - CORE_PEER_LOCALMSPID=Org1MSP
       - CORE_PEER_ADDRESS=peer1.org1.example.com:7051
     ports:
-      - 7056:7051
-      - 7058:7053
+      - 8051:7051
+      - 8053:7053
     volumes:
         - ./crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/:/etc/hyperledger/crypto/peer
     depends_on:
@@ -102,8 +102,8 @@ services:
       - CORE_PEER_LOCALMSPID=Org2MSP
       - CORE_PEER_ADDRESS=peer0.org2.example.com:7051
     ports:
-      - 8051:7051
-      - 8053:7053
+      - 9051:7051
+      - 9053:7053
     volumes:
         - ./crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/:/etc/hyperledger/crypto/peer
     depends_on:
@@ -119,8 +119,8 @@ services:
       - CORE_PEER_LOCALMSPID=Org2MSP
       - CORE_PEER_ADDRESS=peer1.org2.example.com:7051
     ports:
-      - 8056:7051
-      - 8058:7053
+      - 10051:7051
+      - 10053:7053
     volumes:
         - ./crypto-config/peerOrganizations/org2.example.com/peers/peer1.org2.example.com/:/etc/hyperledger/crypto/peer
     depends_on:
