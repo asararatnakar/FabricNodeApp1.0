@@ -1,5 +1,9 @@
 #!/bin/bash
 
+START_STOP="$1"
+
+: ${START_STOP:="restart"}
+
 function dkcl(){
         CONTAINERS=$(docker ps -a|wc -l)
         if [ "$CONTAINERS" -gt "1" ]; then
@@ -19,39 +23,52 @@ function dkrm(){
         fi
 	echo
 }
+function installNodeModules() {
+        echo
+        if [ -d node_modules ]; then
+                echo "============== node modules installed already ============="
+        else
+                echo "============== Installing node modules ============="
+                npm install
+        fi
+        echo
+}
 
-function restartNetwork() {
+function startApp() {
+	#Start the network
+	docker-compose -f ./artifacts/docker-compose.yaml up -d
+	echo
+
+	##Install node modules
+        installNodeModules
+
+	##Start app on port 4000
+	PORT=4000 node app
+}
+
+function shutdownApp() {
 	echo
 
         #teardown the network and clean the containers and intermediate images
-	cd artifacts
-	docker-compose down
+	docker-compose -f ./artifacts/docker-compose.yaml down
 	dkcl
 	dkrm
 
 	#Cleanup the material
 	rm -rf /tmp/hfc-test-kvs_peerOrg* $HOME/.hfc-key-store/ /tmp/fabric-client-kvs_peerOrg*
-	exit
-	#Start the network
-	docker-compose up -d
-	cd -
-	echo
-}
-
-function installNodeModules() {
-	echo
-	if [ -d node_modules ]; then
-		echo "============== node modules installed already ============="
-	else
-		echo "============== Installing node modules ============="
-		npm install
-	fi
-	echo
 }
 
 
-restartNetwork
 
-installNodeModules
-
-PORT=4000 node app
+#Create the network using docker compose
+if [ "${START_STOP}" == "start" ]; then
+        startApp
+elif [ "${START_STOP}" == "stop" ]; then ## Clear the network
+        shutdownApp
+elif [ "${START_STOP}" == "restart" ]; then ## Restart the network
+        shutdownApp
+        startApp
+else
+        echo "Usage: ./runApp.sh [start|stop|restart]"
+        exit 1
+fi
