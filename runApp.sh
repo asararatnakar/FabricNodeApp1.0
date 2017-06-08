@@ -1,15 +1,19 @@
 #!/bin/bash
 
 START_STOP="$1"
+TAG="$2"
 
 : ${START_STOP:="restart"}
-
+: ${TAG:="beta"}
+ARCH=`uname -m`
+export IMAGE_TAG="`uname -m`-1.0.0-$TAG"
+printf "\n ========= IMAGE TAG : $IMAGE_TAG ===========\n"
 function dkcl(){
         CONTAINERS=$(docker ps -a|wc -l)
         if [ "$CONTAINERS" -gt "1" ]; then
                 docker rm -f $(docker ps -aq)
         else
-                echo "========== No containers available for deletion =========="
+                printf "\n========== No containers available for deletion ==========\n"
         fi
 }
 
@@ -23,21 +27,42 @@ function dkrm(){
         fi
 	echo
 }
+
+function cleanAndInstall() {
+	## Make sure cleanup the node_moudles and re-install them again
+	rm -rf ./node_modules
+
+	printf "\n============== Installing node modules =============\n"
+	npm install
+}
+
 function installNodeModules() {
         echo
         if [ -d node_modules ]; then
-                echo "============== node modules installed already ============="
+		npm ls fabric-client && npm ls fabric-ca-client || cleanAndInstall
         else
-                echo "============== Installing node modules ============="
-                npm install
+                cleanAndInstall
         fi
         echo
 }
+function checkForDockerImages() {
+	DOCKER_IMAGES=$(docker images | grep "$IMAGE_TAG" | wc -l)
+	if [ $DOCKER_IMAGES -ne 9 ]; then
+		printf "\n############# You don't have all the images, Let me them pull for you ###########\n"
+		for IMAGE in ca peer orderer couchdb ccenv javaenv kafka tools zookeeper; do
+		      docker pull hyperledger/fabric-$IMAGE:$IMAGE_TAG
+		done
+	fi
+}
 
 function startApp() {
+	checkForDockerImages
 	#Start the network
 	docker-compose -f ./artifacts/docker-compose.yaml up -d
-	echo
+	if [ $? -ne 0 ]; then
+		printf "\n\n!!!!!!!! Unable to pull the start the network, Check your docker-compose !!!!!\n\n"
+		exit
+	fi
 
 	##Install node modules
         installNodeModules

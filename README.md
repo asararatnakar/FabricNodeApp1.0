@@ -11,8 +11,8 @@ A sample Node.js app to demonstrate **__fabric-client__** & **__fabric-ca-client
 * Download docker images
 
 ```
-cd fabric-sdk-node/examples/balance-transfer/
-docker-compose -f artifacts/docker-compose.yaml pull
+cd FabricNodeApp1.0
+IMAGE_TAG="`uname -m`-1.0.0-beta" docker-compose -f artifacts/docker-compose.yaml pull
 ```
 
 Once you have completed the above setup, you will be provisioned a local network with following configuration:
@@ -36,11 +36,11 @@ There are two options available for running the balance-transfer sample
 * Launch the network using docker-compose 
 
 ```
-docker-compose -f artifacts/docker-compose.yaml up
+IMAGE_TAG="`uname -m`-1.0.0-beta" docker-compose -f artifacts/docker-compose.yaml up
 ```
 ##### Terminal Window 2
 
-* Execute the REST APIs from the section [Sample REST APIs Requests](https://github.com/hyperledger/fabric-sdk-node/tree/master/examples/balance-transfer#running-the-sample-program)
+* Execute the REST APIs from the section [Sample REST APIs Requests](https://github.com/asararatnakar/FabricNodeApp1.0#running-the-sample-program)
 
 
 ### Option 2:
@@ -48,26 +48,24 @@ docker-compose -f artifacts/docker-compose.yaml up
 ##### Terminal Window 1
 
 ```
-cd fabric-sdk-node/examples/balance-transfer
+cd FabricNodeApp1.0
 
 ./runApp.sh
 
 ```
  
-* This lauches the required network on your local machine
-* Installs the "alpha" tagged node modules 
+* This launches the required network on your local machine
+* Installs the "beta" tagged node modules
 * And, starts the node app on PORT 4000
 
 ##### Terminal Window 2
 
 
-In order for the following shell script to properly parse the JSON, you must install ``jq``:
-
-Install [jq](https://stedolan.github.io/jq/) 
+In order for the following shell script to properly parse the JSON, you must install [jq](https://stedolan.github.io/jq/):
 
 With the application started in terminal 1, next, test the APIs by executing the script - **testAPIs.sh**:
 ```
-cd fabric-sdk-node/examples/balance-transfer
+cd FabricNodeApp1.0
 
 ./testAPIs.sh
 
@@ -280,6 +278,3 @@ To retrieve the IP Address for one of your network entities, issue the following
 # this will return the IP Address for peer0
 docker inspect peer0 | grep IPAddress
 ```
-
-<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
-
