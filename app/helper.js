@@ -44,9 +44,10 @@ for (let key in ORGS) {
 		cryptoSuite.setCryptoKeyStore(hfc.newCryptoKeyStore({path: getKeyStoreForOrg(ORGS[key].name)}));
 		client.setCryptoSuite(cryptoSuite);
 
-		//TODO: Can we avoid using this configuration
-		let channel = client.newChannel(config.channelName);
-		channel.addOrderer(newOrderer(client));
+		//TODO: Use all the channels
+		let channel = client.newChannel(config.channelsList[0]);
+		//Add all the orderers
+		newOrderer(client, channel)
 
 		clients[key] = client;
 		channels[key] = channel;
@@ -75,14 +76,18 @@ function setupPeers(channel, org, client) {
 	}
 }
 
-function newOrderer(client) {
-	var caRootsPath = ORGS.orderer.tls_cacerts;
-	let data = fs.readFileSync(path.join(__dirname, caRootsPath));
-	let caroots = Buffer.from(data).toString();
-	return client.newOrderer(config.orderer, {
-		'pem': caroots,
-		'ssl-target-name-override': ORGS.orderer['server-hostname']
-	});
+function newOrderer(client, channel) {
+	for (let index in ORGS['orderer']) {
+			let data = fs.readFileSync(path.join(__dirname, ORGS.orderer[index]['tls_cacerts']));
+			let newOrderer = client.newOrderer(
+				ORGS.orderer[index].url,
+				{
+					pem: Buffer.from(data).toString(),
+					'ssl-target-name-override': ORGS.orderer[index]['server-hostname']
+				}
+			);
+			channel.addOrderer(newOrderer);
+	}
 }
 
 function readAllFiles(dir) {

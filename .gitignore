@@ -1,1 +1,5 @@
 node_modules
+artifacts/docker-compose.yaml
+#artifacts/crypto-config/
+#artifacts/channel/*.block
+#artifacts/channel/*.tx

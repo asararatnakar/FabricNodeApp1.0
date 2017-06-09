@@ -7,7 +7,6 @@ TAG="$2"
 : ${TAG:="beta"}
 ARCH=`uname -m`
 export IMAGE_TAG="`uname -m`-1.0.0-$TAG"
-printf "\n ========= IMAGE TAG : $IMAGE_TAG ===========\n"
 function dkcl(){
         CONTAINERS=$(docker ps -a|wc -l)
         if [ "$CONTAINERS" -gt "1" ]; then
@@ -56,34 +55,36 @@ function checkForDockerImages() {
 }
 
 function startApp() {
+  printf "\n ========= IMAGE TAG : $IMAGE_TAG ===========\n"
+
 	checkForDockerImages
+  #source artifacts/generateArtifacts.sh
 	#Start the network
-	docker-compose -f ./artifacts/docker-compose.yaml up -d
+	docker-compose -f ./artifacts/docker-compose.yaml -f ./artifacts/docker-compose-couch.yaml up -d
 	if [ $? -ne 0 ]; then
 		printf "\n\n!!!!!!!! Unable to pull the start the network, Check your docker-compose !!!!!\n\n"
 		exit
 	fi
-
+  #exit
 	##Install node modules
-        installNodeModules
+  installNodeModules
 
 	##Start app on port 4000
 	PORT=4000 node app
 }
 
 function shutdownApp() {
-	echo
-
-        #teardown the network and clean the containers and intermediate images
-	docker-compose -f ./artifacts/docker-compose.yaml down
+	printf "\n======================= TEARDOWN NETWORK ====================\n"
+	# teardown the network and clean the containers and intermediate images
+	docker-compose -f ./artifacts/docker-compose.yaml -f ./artifacts/docker-compose-couch.yaml down
 	dkcl
 	dkrm
 
-	#Cleanup the material
+	# cleanup the material
+	printf "\n======================= CLEANINGUP ARTIFACTS ====================\n\n"
 	rm -rf /tmp/hfc-test-kvs_peerOrg* $HOME/.hfc-key-store/ /tmp/fabric-client-kvs_peerOrg*
+	#rm -rf ./artifacts/channel/*.block channel/*.tx ./artifacts/crypto-config
 }
-
-
 
 #Create the network using docker compose
 if [ "${START_STOP}" == "start" ]; then

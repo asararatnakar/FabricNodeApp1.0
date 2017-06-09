@@ -1,10 +1,18 @@
 {
 	"network-config": {
-		"orderer": {
+		"orderer": [{
 			"url": "grpcs://localhost:7050",
-			"server-hostname": "orderer.example.com",
-			"tls_cacerts": "../artifacts/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt"
-		},
+			"server-hostname": "orderer0.example.com",
+			"tls_cacerts": "../artifacts/crypto-config/ordererOrganizations/example.com/orderers/orderer0.example.com/tls/ca.crt"
+		},{
+			"url": "grpcs://localhost:8050",
+			"server-hostname": "orderer1.example.com",
+			"tls_cacerts": "../artifacts/crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/ca.crt"
+		},{
+			"url": "grpcs://localhost:9050",
+			"server-hostname": "orderer2.example.com",
+			"tls_cacerts": "../artifacts/crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/ca.crt"
+		}],
 		"org1": {
 			"name": "peerOrg1",
 			"mspid": "Org1MSP",
