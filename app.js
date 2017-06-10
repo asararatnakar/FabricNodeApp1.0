@@ -324,7 +324,8 @@ app.get('/channels/:channelName/blocks/:blockId', function(req, res) {
 	logger.debug('==================== GET BLOCK BY NUMBER ==================');
 	let blockId = req.params.blockId;
 	let peer = req.query.peer;
-	logger.debug('channelName : ' + req.params.channelName);
+	let channelName = req.params.channelName;
+	logger.debug('channelName : ' + channelName);
 	logger.debug('BlockID : ' + blockId);
 	logger.debug('Peer : ' + peer);
 	if (!blockId) {
@@ -332,7 +333,7 @@ app.get('/channels/:channelName/blocks/:blockId', function(req, res) {
 		return;
 	}
 
-	query.getBlockByNumber(peer, blockId, req.username, req.orgname)
+	query.getBlockByNumber(peer, blockId, req.username, req.orgname, channelName)
 		.then(function(message) {
 			res.send(message);
 		});
@@ -342,15 +343,17 @@ app.get('/channels/:channelName/transactions/:trxnId', function(req, res) {
 	logger.debug(
 		'================ GET TRANSACTION BY TRANSACTION_ID ======================'
 	);
-	logger.debug('channelName : ' + req.params.channelName);
+
 	let trxnId = req.params.trxnId;
 	let peer = req.query.peer;
+	let channelName = req.params.channelName;
+  logger.debug('channelName : ' + channelName);
 	if (!trxnId) {
 		res.json(getErrorMessage('\'trxnId\''));
 		return;
 	}
 
-	query.getTransactionByID(peer, trxnId, req.username, req.orgname)
+	query.getTransactionByID(peer, trxnId, req.username, req.orgname, channelName)
 		.then(function(message) {
 			res.send(message);
 		});
@@ -358,15 +361,17 @@ app.get('/channels/:channelName/transactions/:trxnId', function(req, res) {
 // Query Get Block by Hash
 app.get('/channels/:channelName/blocks', function(req, res) {
 	logger.debug('================ GET BLOCK BY HASH ======================');
-	logger.debug('channelName : ' + req.params.channelName);
+
 	let hash = req.query.hash;
 	let peer = req.query.peer;
+	let channelName = req.params.channelName;
+	logger.debug('channelName : ' + channelName);
 	if (!hash) {
 		res.json(getErrorMessage('\'hash\''));
 		return;
 	}
 
-	query.getBlockByHash(peer, hash, req.username, req.orgname).then(
+	query.getBlockByHash(peer, hash, req.username, req.orgname, channelName).then(
 		function(message) {
 			res.send(message);
 		});
@@ -375,10 +380,10 @@ app.get('/channels/:channelName/blocks', function(req, res) {
 app.get('/channels/:channelName', function(req, res) {
 	logger.debug(
 		'================ GET CHANNEL INFORMATION ======================');
-	logger.debug('channelName : ' + req.params.channelName);
 	let peer = req.query.peer;
-
-	query.getChainInfo(peer, req.username, req.orgname).then(
+	let channelName = req.params.channelName;
+	logger.debug('channelName : ' + channelName);
+	query.getChainInfo(peer, req.username, req.orgname, channelName).then(
 		function(message) {
 			res.send(message);
 		});
@@ -387,6 +392,7 @@ app.get('/channels/:channelName', function(req, res) {
 app.get('/chaincodes', function(req, res) {
 	var peer = req.query.peer;
 	var installType = req.query.type;
+	var channelName = req.query.channel;
 	//TODO: add Constnats
 	if (installType === 'installed') {
 		logger.debug(
@@ -396,7 +402,7 @@ app.get('/chaincodes', function(req, res) {
 			'================ GET INSTANTIATED CHAINCODES ======================');
 	}
 
-	query.getInstalledChaincodes(peer, installType, req.username, req.orgname)
+	query.getInstalledChaincodes(peer, installType, req.username, req.orgname, channelName)
 	.then(function(message) {
 		res.send(message);
 	});

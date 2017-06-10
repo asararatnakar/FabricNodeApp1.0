@@ -43,17 +43,17 @@ for (let key in ORGS) {
 		let cryptoSuite = hfc.newCryptoSuite();
 		cryptoSuite.setCryptoKeyStore(hfc.newCryptoKeyStore({path: getKeyStoreForOrg(ORGS[key].name)}));
 		client.setCryptoSuite(cryptoSuite);
+		channels[key] = {};
+		for (let index in config.channelsList) {
+			let channelName = config.channelsList[index];
+			let channel = client.newChannel(channelName);
+			//Add all the orderers
+			newOrderer(client, channel)
+			clients[key] = client;
+			channels[key][channelName] = channel;
 
-		//TODO: Use all the channels
-		let channel = client.newChannel(config.channelsList[0]);
-		//Add all the orderers
-		newOrderer(client, channel)
-
-		clients[key] = client;
-		channels[key] = channel;
-
-		setupPeers(channel, key, client);
-
+		  setupPeers(channel, key, client);
+		}
 		let caUrl = ORGS[key].ca;
 		caClients[key] = new copService(caUrl, null /*defautl TLS opts*/, '' /* default CA */, cryptoSuite);
 	}
@@ -109,7 +109,7 @@ function getKeyStoreForOrg(org) {
 	return config.keyValueStore + '_' + org;
 }
 
-function newRemotes(urls, forPeers, userOrg) {
+function newRemotes(urls, forPeers, userOrg, channelName) {
 	var targets = [];
 	// find the peer that match the urls
 	outer:
@@ -168,20 +168,23 @@ function newRemotes(urls, forPeers, userOrg) {
 //-------------------------------------//
 // APIs
 //-------------------------------------//
-var getChannelForOrg = function(org) {
-	return channels[org];
+	var getChannelForOrg = function(org, channelName) {
+	if (channelName == undefined ) {
+		channelName = config.channelsList[0];
+	}
+	return channels[org][channelName];
 };
 
 var getClientForOrg = function(org) {
 	return clients[org];
 };
 
-var newPeers = function(urls) {
-	return newRemotes(urls, true);
+var newPeers = function(urls, channelName) {
+	return newRemotes(urls, true, '', channelName);
 };
 
-var newEventHubs = function(urls, org) {
-	return newRemotes(urls, false, org);
+var newEventHubs = function(urls, org, channelName) {
+	return newRemotes(urls, false, org, channelName);
 };
 
 var getMspID = function(org) {
