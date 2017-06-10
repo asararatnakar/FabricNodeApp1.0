@@ -119,7 +119,7 @@ curl -s -X POST \
   -d '{
 	"peers": ["localhost:7051","localhost:8051"],
 	"chaincodeName":"mycc",
-	"chaincodePath":"github.com/example_cc",
+	"chaincodePath":"github.com/uniqueKeyValue",
 	"chaincodeVersion":"v0"
 }'
 ```
@@ -150,7 +150,7 @@ curl -s -X POST \
   -d '{
 	"peers": ["localhost:7051", "localhost:8051"],
 	"fcn":"invoke",
-	"args":["move","a","b","10"]
+	"args":["put","a","putsomerandomvalue"]
 }'
 ```
 **NOTE:** Ensure that you save the Transaction ID from the response in order to pass this string in the subsequent query transactions. 
@@ -159,7 +159,7 @@ curl -s -X POST \
 
 ```
 curl -s -X GET \
-  "http://localhost:4000/channels/mychannel1/chaincodes/mycc?peer=peer1&args=%5B%22query%22%2C%22a%22%5D" \
+  "http://localhost:4000/channels/mychannel1/chaincodes/mycc?peer=peer1&args=%5B%get%22%2C%22a%22%5D" \
   -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0OTQ4NjU1OTEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE0OTQ4NjE5OTF9.yWaJhFDuTvMQRaZIqg20Is5t-JJ_1BP58yrNLOKxtNI" \
   -H "content-type: application/json"
 ```

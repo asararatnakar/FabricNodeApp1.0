@@ -46,9 +46,9 @@ var queryChaincode = function(peer, channelName, chaincodeName, args, username, 
 		if (response_payloads) {
 			for (let i = 0; i < response_payloads.length; i++) {
 				logger.info('User b now has ' + response_payloads[i].toString('utf8') +
-					' after the move');
+					' after the put');
 				return 'User b now has ' + response_payloads[i].toString('utf8') +
-					' after the move';
+					' after the put';
 			}
 		} else {
 			logger.error('response_payloads is null');
@@ -161,9 +161,9 @@ var getChainInfo = function(peer, username, org) {
 		if (blockchainInfo) {
 			// FIXME: Save this for testing 'getBlockByHash'  ?
 			logger.debug('===========================================');
-			logger.debug(blockchainInfo.currentBlockHash);
+			logger.debug(blockchainInfo);
 			logger.debug('===========================================');
-			//logger.debug(blockchainInfo);
+			logger.debug('\nHeight is : '+blockchainInfo.height.low);
 			return blockchainInfo;
 		} else {
 			logger.error('response_payloads is null');
