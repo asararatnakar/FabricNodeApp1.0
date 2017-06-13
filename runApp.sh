@@ -6,7 +6,9 @@ TAG="$2"
 : ${START_STOP:="restart"}
 : ${TAG:="beta"}
 ARCH=`uname -m`
-export IMAGE_TAG="`uname -m`-1.0.0-$TAG"
+#export IMAGE_TAG="`uname -m`-1.0.0-$TAG"
+export FABRIC_IMAGE_TAG="x86_64-1.0.0-rc1-snapshot-7f5a143"
+export FABRIC_CA_IMAGE_TAG="x86_64-1.0.0-rc1-snapshot-1424b33"
 function dkcl(){
         CONTAINERS=$(docker ps -a|wc -l)
         if [ "$CONTAINERS" -gt "1" ]; then
@@ -45,19 +47,28 @@ function installNodeModules() {
         echo
 }
 function checkForDockerImages() {
-	DOCKER_IMAGES=$(docker images | grep "$IMAGE_TAG" | wc -l)
-	if [ $DOCKER_IMAGES -ne 9 ]; then
-		printf "\n############# You don't have all the images, Let me them pull for you ###########\n"
-		for IMAGE in ca peer orderer couchdb ccenv javaenv kafka tools zookeeper; do
-		      docker pull hyperledger/fabric-$IMAGE:$IMAGE_TAG
+	DOCKER_IMAGES=$(docker images | grep "$FABRIC_IMAGE_TAG" | wc -l)
+	if [ $DOCKER_IMAGES -ne 8 ]; then
+		printf "\n############# You don't have all fabric images, Let me them pull for you ###########\n"
+		for IMAGE in peer orderer couchdb ccenv javaenv kafka tools zookeeper; do
+		      docker pull hyperledger/fabric-$IMAGE:$FABRIC_IMAGE_TAG
 		done
 	fi
+  DOCKER_IMAGES=$(docker images | grep "$FABRIC_CA_IMAGE_TAG" | wc -l)
+  if [ $DOCKER_IMAGES -ne 1 ]; then
+    printf "\n############# You don't have fabric ca images, Let me them pull for you ###########\n"
+    docker pull hyperledger/fabric-ca:$FABRIC_CA_IMAGE_TAG
+  fi
 }
 
 function startApp() {
-  printf "\n ========= IMAGE TAG : $IMAGE_TAG ===========\n"
+  printf "\n ========= FABRIC IMAGE TAG : $FABRIC_IMAGE_TAG ===========\n"
+  printf "\n ========= FABRIC-CA IMAGE TAG : $FABRIC_CA_IMAGE_TAG ===========\n"
 
-	checkForDockerImages
+  #if [ "$TAG" = "beta" ]; then
+	#checkForDockerImages
+  #fi
+
   #source artifacts/generateArtifacts.sh
 	#Start the network
 	docker-compose -f ./artifacts/docker-compose.yaml -f ./artifacts/docker-compose-couch.yaml up -d

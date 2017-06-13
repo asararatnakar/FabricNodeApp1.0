@@ -77,8 +77,9 @@ var getBlockByNumber = function(peer, blockNumber, username, org, channelName) {
 			err.stack : err;
 	}).then((response_payloads) => {
 		if (response_payloads) {
-			//logger.debug(response_payloads);
 			logger.debug(response_payloads);
+			//TODO: determine # of trxns per block
+			//logger.debug('\n\nTransactions Count : '+response_payloads.data.data.length+'\n\n');
 			return response_payloads; //response_payloads.data.data[0].buffer;
 		} else {
 			logger.error('response_payloads is null');

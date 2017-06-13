@@ -134,6 +134,21 @@ app.post('/users', function(req, res) {
 		}
 	});
 });
+// Revoke user
+app.get('/revoke', function(req, res) {
+	logger.info('<<<<<<<<<<<<<<<<< R E V O K E  U S E R >>>>>>>>>>>>>>>>>');
+	let username = req.username;
+	let orgName = req.orgname;
+	logger.debug('User name : ' + username);
+	logger.debug('Org name  : ' + orgName);
+	helper.revokeUser(username, orgName).then(function(response) {
+		if (response && response.success == true) {
+			res.json('successfully revoked user \''+username+'\'');
+		} else {
+			res.json(response);
+		}
+	});
+});
 // Create Channel
 app.post('/channels', function(req, res) {
 	logger.info('<<<<<<<<<<<<<<<<< C R E A T E  C H A N N E L >>>>>>>>>>>>>>>>>');

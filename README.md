@@ -1,6 +1,8 @@
-## A Node-SDK Sample app
+## Fabric Node-SDK Sample app
 
 A sample Node.js app to demonstrate **__fabric-client__** & **__fabric-ca-client__** Node.js SDK APIs
+
+**As of writing this supports beta (and above) commit levels**
 
 ### Prerequisites and setup: 
 
@@ -12,13 +14,13 @@ A sample Node.js app to demonstrate **__fabric-client__** & **__fabric-ca-client
 
 ```
 cd FabricNodeApp1.0
-IMAGE_TAG="`uname -m`-1.0.0-beta" docker-compose -f artifacts/base.yaml pull
+#IMAGE_TAG="`uname -m`-1.0.0-beta" docker-compose -f artifacts/base.yaml pull
 ```
 
 Once you have completed the above setup, you will be provisioned a local network with following configuration:
-* 3 Kafka Brokers + 3 Zookeepers
+* 4 Kafka Brokers + 3 Zookeepers
 * 3 Orderers
-* 2 CAs
+* 2 CA Orgs
 * 4 peers (2 peers per Org)
 * 4 Couchdbs attached to all the peers
 
@@ -82,6 +84,14 @@ Once the tests are completed, cleanup the network and crypto material using the 
 ```
 
 The response contains the success/failure status, an **enrollment Secret** and a **JSON Web Token (JWT)** that is a required string in the Request Headers for subsequent requests.
+
+#### Revoke user
+```
+curl -s -X GET \
+  http://localhost:4000/revoke \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0OTQ4NjU1OTEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Im9yZzEiLCJpYXQiOjE0OTQ4NjE5OTF9.yWaJhFDuTvMQRaZIqg20Is5t-JJ_1BP58yrNLOKxtNI"  \
+  -H "content-type: application/json"
+```
 
 ### Create Channel request
 

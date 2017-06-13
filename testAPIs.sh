@@ -8,7 +8,7 @@ if [ $? -ne 0 ]; then
 fi
 starttime=$(date +%s)
 
-echo "POST request Enroll on Org1  ..."
+echo "POST request Enroll user 'Jim' on Org1  ..."
 echo
 ORG1_TOKEN=$(curl -s -X POST \
   http://localhost:4000/users \
@@ -17,9 +17,8 @@ ORG1_TOKEN=$(curl -s -X POST \
 echo $ORG1_TOKEN
 ORG1_TOKEN=$(echo $ORG1_TOKEN | jq ".token" | sed "s/\"//g")
 echo
-echo "ORG1 token is $ORG1_TOKEN"
-echo
-echo "POST request Enroll on Org2 ..."
+
+echo "POST request Enroll user 'Barry' on Org2 ..."
 echo
 ORG2_TOKEN=$(curl -s -X POST \
   http://localhost:4000/users \
@@ -30,6 +29,24 @@ ORG2_TOKEN=$(echo $ORG2_TOKEN | jq ".token" | sed "s/\"//g")
 echo
 echo "ORG2 token is $ORG2_TOKEN"
 echo
+
+echo "POST request Enroll user 'Ratz' on Org1  ..."
+echo
+TEMP_TOKEN=$(curl -s -X POST \
+  http://localhost:4000/users \
+  -H "content-type: application/x-www-form-urlencoded" \
+  -d 'username=Ratz&orgName=org1')
+TEMP_TOKEN=$(echo $TEMP_TOKEN | jq ".token" | sed "s/\"//g")
+echo
+echo "GET request to revoke user 'Ratz' on Org1  ..."
+echo
+curl -s -X GET \
+  "http://localhost:4000/revoke" \
+  -H "authorization: Bearer $TEMP_TOKEN" \
+  -H "content-type: application/json"
+echo
+echo
+
 echo
 echo "POST request Create channel  ..."
 echo

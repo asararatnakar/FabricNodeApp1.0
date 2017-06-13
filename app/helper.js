@@ -23,7 +23,7 @@ var util = require('util');
 var fs = require('fs-extra');
 var User = require('fabric-client/lib/User.js');
 var crypto = require('crypto');
-var copService = require('fabric-ca-client');
+var FabricCAService = require('fabric-ca-client');
 var config = require('../config.json');
 
 var hfc = require('fabric-client');
@@ -55,7 +55,7 @@ for (let key in ORGS) {
 		  setupPeers(channel, key, client);
 		}
 		let caUrl = ORGS[key].ca;
-		caClients[key] = new copService(caUrl, null /*defautl TLS opts*/, '' /* default CA */, cryptoSuite);
+		caClients[key] = new FabricCAService(caUrl, null /*defautl TLS opts*/, '' /* default CA */, cryptoSuite);
 	}
 }
 
@@ -273,7 +273,7 @@ var getRegisteredUsers = function(username, userOrg, isJson) {
 						logger.error(username + ' enrollment failed');
 						return message;
 					}
-					logger.debug(username + ' enrolled successfully');
+					logger.debug(username + ' enrolled successfully on '+userOrg);
 
 					member = new User(username);
 					member._enrollmentSecret = enrollmentSecret;
@@ -333,6 +333,24 @@ var getOrgAdmin = function(userOrg) {
 	});
 };
 
+var revokeUser = function(username, userOrg) {
+	var client = getClientForOrg(userOrg);
+	return hfc.newDefaultKeyValueStore({
+		path: getKeyStoreForOrg(getOrgName(userOrg))
+	}).then((store) => {
+		client.setStateStore(store);
+		client._userContext = null;
+		let caClient = caClients[userOrg];
+		return getAdminUser(userOrg).then(function(member) {
+			console.log(member);
+			return caClient.revoke({enrollmentID: username}, member);
+		});
+	}).then((result)=> {
+		console.log(result);
+		return result;
+	});
+}
+
 var setupChaincodeDeploy = function() {
 	process.env.GOPATH = path.join(__dirname, config.GOPATH);
 };
@@ -359,3 +377,4 @@ exports.newEventHubs = newEventHubs;
 exports.getPeerAddressByName = getPeerAddressByName;
 exports.getRegisteredUsers = getRegisteredUsers;
 exports.getOrgAdmin = getOrgAdmin;
+exports.revokeUser = revokeUser;

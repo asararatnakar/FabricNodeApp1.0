@@ -74,7 +74,7 @@ var joinChannel = function(channelName, peers, username, org) {
 
 		for (let key in ORGS[org]) {
 			if (ORGS[org].hasOwnProperty(key)) {
-				if (key.indexOf('peer') === 0) {
+				if (key.indexOf('peer') === 0 && peers.indexOf(key) >= 0) {
 					let data = fs.readFileSync(path.join(__dirname, ORGS[org][key][
 						'tls_cacerts'
 					]));

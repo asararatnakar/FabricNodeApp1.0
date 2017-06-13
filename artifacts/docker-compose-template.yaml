@@ -73,8 +73,6 @@ services:
       - KAFKA_MIN_INSYNC_REPLICAS=2
       - KAFKA_DEFAULT_REPLICATION_FACTOR=3
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181,zookeeper1:2181,zookeeper2:2181
-    ports:
-      - 9092:9092
     depends_on:
       - zookeeper0
       - zookeeper1
@@ -90,8 +88,6 @@ services:
       - KAFKA_MIN_INSYNC_REPLICAS=2
       - KAFKA_DEFAULT_REPLICATION_FACTOR=3
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181,zookeeper1:2181,zookeeper2:2181
-    ports:
-      - 9094:9092
     depends_on:
       - zookeeper0
       - zookeeper1
@@ -107,8 +103,21 @@ services:
       - KAFKA_MIN_INSYNC_REPLICAS=2
       - KAFKA_DEFAULT_REPLICATION_FACTOR=3
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181,zookeeper1:2181,zookeeper2:2181
-    ports:
-      - 9096:9092
+    depends_on:
+      - zookeeper0
+      - zookeeper1
+      - zookeeper2
+
+  kafka3:
+    container_name: kafka3
+    extends:
+      file: base.yaml
+      service: kafka
+    environment:
+      - KAFKA_BROKER_ID=3
+      - KAFKA_MIN_INSYNC_REPLICAS=2
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181,zookeeper1:2181,zookeeper2:2181
     depends_on:
       - zookeeper0
       - zookeeper1
@@ -126,9 +135,13 @@ services:
     ports:
       - 7050:7050
     depends_on:
+      - zookeeper0
+      - zookeeper1
+      - zookeeper2
       - kafka0
       - kafka1
       - kafka2
+      - kafka3
 
   orderer1.example.com:
     container_name: orderer1.example.com
@@ -142,9 +155,13 @@ services:
     ports:
       - 8050:7050
     depends_on:
+      - zookeeper0
+      - zookeeper1
+      - zookeeper2
       - kafka0
       - kafka1
       - kafka2
+      - kafka3
 
   orderer2.example.com:
     container_name: orderer2.example.com
@@ -158,9 +175,13 @@ services:
     ports:
       - 9050:7050
     depends_on:
+      - zookeeper0
+      - zookeeper1
+      - zookeeper2
       - kafka0
       - kafka1
       - kafka2
+      - kafka3
 
   peer0.org1.example.com:
     container_name: peer0.org1.example.com

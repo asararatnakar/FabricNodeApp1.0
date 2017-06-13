@@ -8,7 +8,9 @@ version: '2'
 services:
   couchdb0:
     container_name: couchdb0
-    image: hyperledger/fabric-couchdb:${IMAGE_TAG}
+    extends:
+      file: base.yaml
+      service: couchdb
     # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
@@ -23,7 +25,9 @@ services:
 
   couchdb1:
     container_name: couchdb1
-    image: hyperledger/fabric-couchdb:${IMAGE_TAG}
+    extends:
+      file: base.yaml
+      service: couchdb
     # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
@@ -38,7 +42,9 @@ services:
 
   couchdb2:
     container_name: couchdb2
-    image: hyperledger/fabric-couchdb:${IMAGE_TAG}
+    extends:
+      file: base.yaml
+      service: couchdb
     # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
@@ -53,7 +59,9 @@ services:
 
   couchdb3:
     container_name: couchdb3
-    image: hyperledger/fabric-couchdb:${IMAGE_TAG}
+    extends:
+      file: base.yaml
+      service: couchdb
     # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
