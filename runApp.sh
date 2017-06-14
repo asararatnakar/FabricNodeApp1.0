@@ -7,7 +7,7 @@ TAG="$2"
 : ${TAG:="beta"}
 ARCH=`uname -m`
 #export IMAGE_TAG="`uname -m`-1.0.0-$TAG"
-export FABRIC_IMAGE_TAG="x86_64-1.0.0-rc1-snapshot-7f5a143"
+export FABRIC_IMAGE_TAG="x86_64-1.0.0-rc1-snapshot-123b3d7"
 export FABRIC_CA_IMAGE_TAG="x86_64-1.0.0-rc1-snapshot-1424b33"
 function dkcl(){
         CONTAINERS=$(docker ps -a|wc -l)

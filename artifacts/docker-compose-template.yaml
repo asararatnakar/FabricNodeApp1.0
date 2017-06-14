@@ -43,7 +43,12 @@ services:
       service: zookeeper
     environment:
       - ZOO_MY_ID=1
-      - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
+      - ZOO_PORT=2181
+      - ZOO_SERVERS=server.1=zookeeper0:2182:2183:participant server.2=zookeeper1:3182:3183:participant server.3=zookeeper2:4182:4183:participant
+    ports:
+      - 2181:2181
+      - 2182:2182
+      - 2183:2183
 
   zookeeper1:
     container_name: zookeeper1
@@ -52,7 +57,12 @@ services:
       service: zookeeper
     environment:
       - ZOO_MY_ID=2
-      - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
+      - ZOO_PORT=3181
+      - ZOO_SERVERS=server.1=zookeeper0:2182:2183:participant server.2=zookeeper1:3182:3183:participant server.3=zookeeper2:4182:4183:participant
+    ports:
+      - 3181:3181
+      - 3182:3182
+      - 3183:3183
 
   zookeeper2:
     container_name: zookeeper2
@@ -61,7 +71,12 @@ services:
       service: zookeeper
     environment:
       - ZOO_MY_ID=3
-      - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
+      - ZOO_PORT=4181
+      - ZOO_SERVERS=server.1=zookeeper0:2182:2183:participant server.2=zookeeper1:3182:3183:participant server.3=zookeeper2:4182:4183:participant
+    ports:
+      - 4181:4181
+      - 4182:4182
+      - 4183:4183
 
   kafka0:
     container_name: kafka0
@@ -135,9 +150,6 @@ services:
     ports:
       - 7050:7050
     depends_on:
-      - zookeeper0
-      - zookeeper1
-      - zookeeper2
       - kafka0
       - kafka1
       - kafka2
@@ -155,9 +167,6 @@ services:
     ports:
       - 8050:7050
     depends_on:
-      - zookeeper0
-      - zookeeper1
-      - zookeeper2
       - kafka0
       - kafka1
       - kafka2
@@ -175,9 +184,6 @@ services:
     ports:
       - 9050:7050
     depends_on:
-      - zookeeper0
-      - zookeeper1
-      - zookeeper2
       - kafka0
       - kafka1
       - kafka2
