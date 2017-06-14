@@ -43,12 +43,7 @@ services:
       service: zookeeper
     environment:
       - ZOO_MY_ID=1
-      - ZOO_PORT=2181
-      - ZOO_SERVERS=server.1=zookeeper0:2182:2183:participant server.2=zookeeper1:3182:3183:participant server.3=zookeeper2:4182:4183:participant
-    ports:
-      - 2181:2181
-      - 2182:2182
-      - 2183:2183
+      - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
 
   zookeeper1:
     container_name: zookeeper1
@@ -57,12 +52,7 @@ services:
       service: zookeeper
     environment:
       - ZOO_MY_ID=2
-      - ZOO_PORT=3181
-      - ZOO_SERVERS=server.1=zookeeper0:2182:2183:participant server.2=zookeeper1:3182:3183:participant server.3=zookeeper2:4182:4183:participant
-    ports:
-      - 3181:3181
-      - 3182:3182
-      - 3183:3183
+      - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
 
   zookeeper2:
     container_name: zookeeper2
@@ -71,12 +61,7 @@ services:
       service: zookeeper
     environment:
       - ZOO_MY_ID=3
-      - ZOO_PORT=4181
-      - ZOO_SERVERS=server.1=zookeeper0:2182:2183:participant server.2=zookeeper1:3182:3183:participant server.3=zookeeper2:4182:4183:participant
-    ports:
-      - 4181:4181
-      - 4182:4182
-      - 4183:4183
+      - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
 
   kafka0:
     container_name: kafka0
@@ -88,8 +73,6 @@ services:
       - KAFKA_MIN_INSYNC_REPLICAS=2
       - KAFKA_DEFAULT_REPLICATION_FACTOR=3
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181,zookeeper1:2181,zookeeper2:2181
-    ports:
-      - 9092:9092
     depends_on:
       - zookeeper0
       - zookeeper1
@@ -105,8 +88,6 @@ services:
       - KAFKA_MIN_INSYNC_REPLICAS=2
       - KAFKA_DEFAULT_REPLICATION_FACTOR=3
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181,zookeeper1:2181,zookeeper2:2181
-    ports:
-      - 9094:9092
     depends_on:
       - zookeeper0
       - zookeeper1
@@ -122,8 +103,21 @@ services:
       - KAFKA_MIN_INSYNC_REPLICAS=2
       - KAFKA_DEFAULT_REPLICATION_FACTOR=3
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181,zookeeper1:2181,zookeeper2:2181
-    ports:
-      - 9096:9092
+    depends_on:
+      - zookeeper0
+      - zookeeper1
+      - zookeeper2
+
+  kafka3:
+    container_name: kafka3
+    extends:
+      file: base.yaml
+      service: kafka
+    environment:
+      - KAFKA_BROKER_ID=3
+      - KAFKA_MIN_INSYNC_REPLICAS=2
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181,zookeeper1:2181,zookeeper2:2181
     depends_on:
       - zookeeper0
       - zookeeper1
@@ -144,6 +138,7 @@ services:
       - kafka0
       - kafka1
       - kafka2
+      - kafka3
 
   orderer1.example.com:
     container_name: orderer1.example.com
@@ -160,6 +155,7 @@ services:
       - kafka0
       - kafka1
       - kafka2
+      - kafka3
 
   orderer2.example.com:
     container_name: orderer2.example.com
@@ -176,6 +172,7 @@ services:
       - kafka0
       - kafka1
       - kafka2
+      - kafka3
 
   peer0.org1.example.com:
     container_name: peer0.org1.example.com
