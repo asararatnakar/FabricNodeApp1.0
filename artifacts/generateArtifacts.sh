@@ -39,14 +39,14 @@ function replacePrivateKey () {
 
 	cp docker-compose-template.yaml docker-compose.yaml
 
-  cd crypto-config/peerOrganizations/org1.example.com/ca/
-  PRIV_KEY=$(ls *_sk)
-  cd $CURRENT_DIR/artifacts
-  sed $OPTS "s/CA1_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose.yaml
-  cd crypto-config/peerOrganizations/org2.example.com/ca/
-  PRIV_KEY=$(ls *_sk)
-  cd $CURRENT_DIR/artifacts
-  sed $OPTS "s/CA2_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose.yaml
+  	cd crypto-config/peerOrganizations/org1.example.com/ca/
+  	PRIV_KEY=$(ls *_sk)
+  	cd $CURRENT_DIR/artifacts
+  	sed $OPTS "s/CA1_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose.yaml
+  	cd crypto-config/peerOrganizations/org2.example.com/ca/
+  	PRIV_KEY=$(ls *_sk)
+  	cd $CURRENT_DIR/artifacts
+  	sed $OPTS "s/CA2_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose.yaml
 }
 
 ## Generate orderer genesis block , channel configuration transaction and anchor peer update transactions
@@ -73,7 +73,7 @@ function generateChannelArtifacts() {
 }
 
 cd artifacts
-generateCerts
+#generateCerts
 replacePrivateKey
 generateChannelArtifacts
 cd $CURRENT_DIR

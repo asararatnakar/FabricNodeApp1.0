@@ -362,7 +362,7 @@ app.get('/channels/:channelName/transactions/:trxnId', function(req, res) {
 	let trxnId = req.params.trxnId;
 	let peer = req.query.peer;
 	let channelName = req.params.channelName;
-  logger.debug('channelName : ' + channelName);
+        logger.debug('channelName : ' + channelName);
 	if (!trxnId) {
 		res.json(getErrorMessage('\'trxnId\''));
 		return;
@@ -398,7 +398,7 @@ app.get('/channels/:channelName', function(req, res) {
 	let peer = req.query.peer;
 	let channelName = req.params.channelName;
 	logger.debug('channelName : ' + channelName);
-	query.getChainInfo(peer, req.username, req.orgname, channelName).then(
+	query.getChannelInfo(peer, req.username, req.orgname, channelName).then(
 		function(message) {
 			res.send(message);
 		});
@@ -437,4 +437,17 @@ app.get('/channels', function(req, res) {
 		message) {
 		res.send(message);
 	});
+});
+
+// Query to get BlockCount on a channel
+app.get('/channels/:channelName/height', function(req, res) {
+	logger.debug('================ GET BLOCK HEIGHT OF CHANNEL ======================');
+	let peer = req.query.peer;
+	let channelName = req.params.channelName;
+	logger.debug('channelName : ' + channelName);
+
+	query.getChannelHeight(peer, req.username, req.orgname, channelName).then(
+		function(message) {
+			res.send(message);
+		});
 });

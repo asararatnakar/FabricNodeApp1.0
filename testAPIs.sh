@@ -314,11 +314,20 @@ echo
 #echo
 #echo
 
-echo "GET query ChainInfo"
+echo "GET query ChainInfo on mychannel1"
 echo
 curl -s -X GET \
   "http://localhost:4000/channels/mychannel1?peer=peer1" \
   -H "authorization: Bearer $ORG1_TOKEN" \
+  -H "content-type: application/json"
+echo
+echo
+
+echo "GET query ChainInfo on mychannel2"
+echo
+curl -s -X GET \
+  "http://localhost:4000/channels/mychannel2?peer=peer1" \
+  -H "authorization: Bearer $ORG2_TOKEN" \
   -H "content-type: application/json"
 echo
 echo
@@ -358,6 +367,25 @@ curl -s -X GET \
   -H "content-type: application/json"
 echo
 echo
+
+echo "GET height of channel mychannel1"
+echo
+curl -s -X GET \
+  "http://localhost:4000/channels/mychannel1/height?peer=peer1" \
+  -H "authorization: Bearer $ORG1_TOKEN" \
+  -H "content-type: application/json"
+echo
+
+echo "GET height of channel mychannel2"
+echo
+curl -s -X GET \
+  "http://localhost:4000/channels/mychannel2/height?peer=peer1" \
+  -H "authorization: Bearer $ORG2_TOKEN" \
+  -H "content-type: application/json"
+echo
+
+echo
+exit
 
 
 echo "Total execution time : $(($(date +%s)-starttime)) secs ..."

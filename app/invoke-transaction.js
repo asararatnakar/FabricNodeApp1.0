@@ -80,6 +80,8 @@ var invokeChaincode = function(peersUrls, channelName, chaincodeName, fcn, args,
 			// if the transaction did not get committed within the timeout period,
 			// fail the test
 			var transactionID = tx_id.getTransactionID();
+			var sendPromise = channel.sendTransaction(request);
+
 			var eventPromises = [];
 
 			var eventhubs = helper.newEventHubs(peersUrls, org);
@@ -112,7 +114,7 @@ var invokeChaincode = function(peersUrls, channelName, chaincodeName, fcn, args,
 				});
 				eventPromises.push(txPromise);
 			};
-			var sendPromise = channel.sendTransaction(request);
+			
 			return Promise.all([sendPromise].concat(eventPromises)).then((results) => {
 				logger.debug(' event promise all complete and testing complete');
 				return results[0]; // the first returned value is from the 'sendPromise' which is from the 'sendTransaction()' call

@@ -1,14 +1,54 @@
 #!/bin/bash
 
-START_STOP="$1"
-TAG="$2"
+##TODO: generate artifacts etc., tedious ?
+## usage message
+function usage () {
+  echo "Usage: "
+  echo "  runApp.sh [-m start|stop|restart] [-t <release-tag>] [-c enable-CouchDB]"
+  echo "  runApp.sh -h|--help (print this message)"
+  echo "      -m <mode> - one of 'start', 'stop', 'restart' or 'generate'"
+  echo "      - 'start' - bring up the network with docker-compose up & start the app on port 4000"
+  echo "      - 'stop'  - stop the network with docker-compose down & clear containers , crypto keys etc.,"
+  echo "      - 'restart' -  restarts the network and start the app on port 4000 (Typically stop + start)"
+  echo "     -c enable CouchDB"
+  echo "     -t <release-tag> - ex: alpha | beta | rc , missing this option will result in using the latest docker images"
+  echo
+  echo "Some possible options:"
+  echo
+  echo "	runApp.sh"
+  echo "	runApp.sh -m restart -t beta"
+  echo "	runApp.sh -m start -c"
+  echo "	runApp.sh -m stop"
+  echo "	runApp.sh -m start -t rc1"
+  echo
+  echo "All defaults:"
+  echo "	runApp.sh"
+  echo "	RESTART the network/app, use latest docker images but TAG, Disable couchdb "
+}
 
-: ${START_STOP:="restart"}
-: ${TAG:="beta"}
-ARCH=`uname -m`
-#export IMAGE_TAG="`uname -m`-1.0.0-$TAG"
-export FABRIC_IMAGE_TAG="x86_64-1.0.0-rc1-snapshot-123b3d7"
-export FABRIC_CA_IMAGE_TAG="x86_64-1.0.0-rc1-snapshot-1424b33"
+# Parse commandline args
+while getopts "h?m:t:c" opt; do
+  case "$opt" in
+    h|\?)
+      usage
+      exit 1
+    ;;
+    m)  MODE=$OPTARG
+    ;;
+    c)  COUCHDB='y'
+    ;;
+    t)  IMAGE_TAG="`uname -m`-1.0.0-$OPTARG"
+    ;;
+  esac
+done
+
+: ${MODE:="restart"}
+: ${IMAGE_TAG:="latest"}
+: ${COUCHDB:="n"}
+export IMAGE_TAG
+
+COMPOSE_FILE=./artifacts/docker-compose.yaml
+COMPOSE_FILE_WITH_COUCH=./artifacts/docker-compose-couch.yaml
 function dkcl(){
         CONTAINERS=$(docker ps -a|wc -l)
         if [ "$CONTAINERS" -gt "1" ]; then
@@ -47,38 +87,38 @@ function installNodeModules() {
         echo
 }
 function checkForDockerImages() {
-	DOCKER_IMAGES=$(docker images | grep "$FABRIC_IMAGE_TAG" | wc -l)
+	DOCKER_IMAGES=$(docker images | grep "$IMAGE_TAG" | wc -l)
 	if [ $DOCKER_IMAGES -ne 8 ]; then
 		printf "\n############# You don't have all fabric images, Let me them pull for you ###########\n"
-		for IMAGE in peer orderer couchdb ccenv javaenv kafka tools zookeeper; do
-		      docker pull hyperledger/fabric-$IMAGE:$FABRIC_IMAGE_TAG
+		for IMAGE in peer orderer ca couchdb ccenv javaenv kafka tools zookeeper; do
+		      docker pull hyperledger/fabric-$IMAGE:$IMAGE_TAG
 		done
 	fi
-  DOCKER_IMAGES=$(docker images | grep "$FABRIC_CA_IMAGE_TAG" | wc -l)
-  if [ $DOCKER_IMAGES -ne 1 ]; then
-    printf "\n############# You don't have fabric ca images, Let me them pull for you ###########\n"
-    docker pull hyperledger/fabric-ca:$FABRIC_CA_IMAGE_TAG
-  fi
 }
 
 function startApp() {
-  printf "\n ========= FABRIC IMAGE TAG : $FABRIC_IMAGE_TAG ===========\n"
-  printf "\n ========= FABRIC-CA IMAGE TAG : $FABRIC_CA_IMAGE_TAG ===========\n"
+  	if [ "$IMAGE_TAG" = "latest" ]; then
+		printf "\n ========= Using latest Docker images ===========\n"
+	else
+		printf "\n ========= FABRIC IMAGE TAG : $IMAGE_TAG ===========\n"
+		checkForDockerImages
+  	fi
 
-  #if [ "$TAG" = "beta" ]; then
-	#checkForDockerImages
-  #fi
+  	#source artifacts/generateArtifacts.sh
 
-  #source artifacts/generateArtifacts.sh
-	#Start the network
-	docker-compose -f ./artifacts/docker-compose.yaml -f ./artifacts/docker-compose-couch.yaml up -d
+	#Launch the network
+	if [ "$COUCHDB" = "y" -o "$COUCHDB" = "Y" ]; then
+		docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_WITH_COUCH up -d
+	else 
+		docker-compose -f $COMPOSE_FILE up -d
+	fi
 	if [ $? -ne 0 ]; then
 		printf "\n\n!!!!!!!! Unable to pull the start the network, Check your docker-compose !!!!!\n\n"
 		exit
 	fi
-  #exit
+
 	##Install node modules
-  installNodeModules
+	installNodeModules
 
 	##Start app on port 4000
 	PORT=4000 node app
@@ -87,7 +127,7 @@ function startApp() {
 function shutdownApp() {
 	printf "\n======================= TEARDOWN NETWORK ====================\n"
 	# teardown the network and clean the containers and intermediate images
-	docker-compose -f ./artifacts/docker-compose.yaml -f ./artifacts/docker-compose-couch.yaml down
+	docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_WITH_COUCH down
 	dkcl
 	dkrm
 
@@ -97,15 +137,15 @@ function shutdownApp() {
 	#rm -rf ./artifacts/channel/*.block channel/*.tx ./artifacts/crypto-config
 }
 
-#Create the network using docker compose
-if [ "${START_STOP}" == "start" ]; then
+#Launch the network using docker compose
+if [ "${MODE}" == "start" ]; then
         startApp
-elif [ "${START_STOP}" == "stop" ]; then ## Clear the network
+elif [ "${MODE}" == "stop" ]; then ## Clear the network
         shutdownApp
-elif [ "${START_STOP}" == "restart" ]; then ## Restart the network
+elif [ "${MODE}" == "restart" ]; then ## Restart the network
         shutdownApp
         startApp
 else
-        echo "Usage: ./runApp.sh [start|stop|restart]"
+        usage
         exit 1
 fi
