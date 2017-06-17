@@ -4,30 +4,36 @@
 ## usage message
 function usage () {
   echo "Usage: "
-  echo "  runApp.sh [-m start|stop|restart] [-t <release-tag>] [-c enable-CouchDB]"
+  echo "  runApp.sh [-m start|stop|restart] [-t <release-tag>] [-c enable-CouchDB] [-l capture-logs]"
   echo "  runApp.sh -h|--help (print this message)"
   echo "      -m <mode> - one of 'start', 'stop', 'restart' or 'generate'"
   echo "      - 'start' - bring up the network with docker-compose up & start the app on port 4000"
+  echo "      - 'up'    - same as start"
   echo "      - 'stop'  - stop the network with docker-compose down & clear containers , crypto keys etc.,"
+  echo "      - 'down'  - same as stop"
   echo "      - 'restart' -  restarts the network and start the app on port 4000 (Typically stop + start)"
   echo "     -c enable CouchDB"
+  echo "     -l capture docker logs before network teardown"
   echo "     -t <release-tag> - ex: alpha | beta | rc , missing this option will result in using the latest docker images"
   echo
   echo "Some possible options:"
   echo
   echo "	runApp.sh"
+  echo "	runApp.sh -l"
   echo "	runApp.sh -m restart -t beta"
   echo "	runApp.sh -m start -c"
   echo "	runApp.sh -m stop"
   echo "	runApp.sh -m start -t rc1"
+  echo "	runApp.sh -m stop -l"
   echo
   echo "All defaults:"
   echo "	runApp.sh"
   echo "	RESTART the network/app, use latest docker images but TAG, Disable couchdb "
+  exit 1
 }
 
 # Parse commandline args
-while getopts "h?m:t:c" opt; do
+while getopts "h?m:t:cl" opt; do
   case "$opt" in
     h|\?)
       usage
@@ -37,7 +43,14 @@ while getopts "h?m:t:c" opt; do
     ;;
     c)  COUCHDB='y'
     ;;
-    t)  IMAGE_TAG="`uname -m`-1.0.0-$OPTARG"
+    l)  ENABLE_LOGS='y'
+    ;;
+    t)  TAG="$OPTARG"
+	if [ "$TAG" -ne "beta" -o "$TAG" -ne "rc1" ]; then
+		usage
+	fi
+	IMAGE_TAG="`uname -m`-1.0.0-$OPTARG"
+	##TODO: ensure package.json contains right node packages
     ;;
   esac
 done
@@ -45,6 +58,7 @@ done
 : ${MODE:="restart"}
 : ${IMAGE_TAG:="latest"}
 : ${COUCHDB:="n"}
+: ${ENABLE_LOGS:="n"}
 export IMAGE_TAG
 
 COMPOSE_FILE=./artifacts/docker-compose.yaml
@@ -103,7 +117,7 @@ function startApp() {
 		printf "\n ========= FABRIC IMAGE TAG : $IMAGE_TAG ===========\n"
 		checkForDockerImages
   	fi
-
+	### Let's not worry about dynamic generation of Org certs and channel artifacts 
   	#source artifacts/generateArtifacts.sh
 
 	#Launch the network
@@ -126,6 +140,9 @@ function startApp() {
 
 function shutdownApp() {
 	printf "\n======================= TEARDOWN NETWORK ====================\n"
+	if [ "$ENABLE_LOGS" = "y" -o "$ENABLE_LOGS" = "Y" ]; then
+		source ./artifacts/getContainerLogs.sh
+	fi
 	# teardown the network and clean the containers and intermediate images
 	docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_WITH_COUCH down
 	dkcl
@@ -134,18 +151,24 @@ function shutdownApp() {
 	# cleanup the material
 	printf "\n======================= CLEANINGUP ARTIFACTS ====================\n\n"
 	rm -rf /tmp/hfc-test-kvs_peerOrg* $HOME/.hfc-key-store/ /tmp/fabric-client-kvs_peerOrg*
+
+	### Let's not worry about clearing about Org certs and channel artifacts 
 	#rm -rf ./artifacts/channel/*.block channel/*.tx ./artifacts/crypto-config
 }
 
 #Launch the network using docker compose
-if [ "${MODE}" == "start" ]; then
-        startApp
-elif [ "${MODE}" == "stop" ]; then ## Clear the network
-        shutdownApp
-elif [ "${MODE}" == "restart" ]; then ## Restart the network
-        shutdownApp
-        startApp
-else
-        usage
-        exit 1
-fi
+case $MODE in
+	'start'|'up')
+		startApp
+	;;
+	'stop'|'down')
+		shutdownApp
+	;;
+	'restart')
+		shutdownApp
+	        startApp
+	;;
+	*)
+		usage
+	;;
+esac
