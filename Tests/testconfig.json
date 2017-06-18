@@ -1,0 +1,16 @@
+{
+   "banner":"!! Tests Started !!",
+   "host":"localhost",
+   "port":"4000",
+   "channels": ["mychannel1","mychannel2"],
+   "chaincodes":[
+	{ "invoke": "put", "query": "get","version":"v0", "path":"github.com/uniqueKeyValue" },
+	{ "invoke": "move", "query": "query","version":"v0", "path":"github.com/example_cc" }
+   ],
+   "orgs":[ 
+	{"orgName": "org1" ,"peers": ["localhost:7051", "localhost:8051"]}, 
+	{"orgName": "org2" ,"peers": ["localhost:9051", "localhost:10051"]}
+   ],
+   "users":[ "Barry", "Jim", "Tom" ]
+   
+}
