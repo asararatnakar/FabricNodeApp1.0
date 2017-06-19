@@ -28,7 +28,7 @@ var ORGS = hfc.getConfigSetting('network-config');
 var tx_id = null;
 var eh = null;
 
-var instantiateChaincode = function(channelName, chaincodeName, chaincodeVersion, functionName, args, username, org) {
+var instantiateChaincode = function(channelName, chaincodeName, chaincodeVersion, functionName, args, username, org, isUpgrade) {
 	logger.debug('\n============ Instantiate chaincode on organization ' + org +
 		' ============\n');
 
@@ -53,7 +53,11 @@ var instantiateChaincode = function(channelName, chaincodeName, chaincodeVersion
 			args: args,
 			txId: tx_id
 		};
-		return channel.sendInstantiateProposal(request);
+		if (isUpgrade){
+			return channel.sendUpgradeProposal(request);
+		} else {
+			return channel.sendInstantiateProposal(request);
+		}
 	}, (err) => {
 		logger.error('Failed to initialize the channel');
 		throw new Error('Failed to initialize the channel');

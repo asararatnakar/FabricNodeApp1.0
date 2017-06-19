@@ -17,6 +17,8 @@ ORG1_TOKEN=$(curl -s -X POST \
 echo $ORG1_TOKEN
 ORG1_TOKEN=$(echo $ORG1_TOKEN | jq ".token" | sed "s/\"//g")
 echo
+echo "ORG1 token is $ORG1_TOKEN"
+echo
 
 echo "POST request Enroll user 'Barry' on Org2 ..."
 echo
@@ -60,7 +62,7 @@ curl -s -X POST \
 }'
 echo
 echo
-sleep 5
+sleep 10
 echo "POST request Join channel on Org1"
 echo
 curl -s -X POST \
@@ -98,7 +100,8 @@ curl -s -X POST \
 }'
 echo
 echo
-sleep 5
+sleep 10
+echo
 echo "POST request Join channel on Org1"
 echo
 curl -s -X POST \
@@ -137,7 +140,6 @@ curl -s -X POST \
 }'
 echo
 echo
-
 
 echo "POST Install chaincode on Org2"
 echo
@@ -385,7 +387,29 @@ curl -s -X GET \
 echo
 
 echo
-exit
 
-
-echo "Total execution time : $(($(date +%s)-starttime)) secs ..."
+echo "POST upgrade chaincode on peer1 of Org1 on mychannel1 with v1"
+echo
+curl -s -X POST \
+  http://localhost:4000/channels/mychannel1/chaincodes \
+  -H "authorization: Bearer $ORG1_TOKEN" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["localhost:7051","localhost:8051"],
+	"chaincodeName":"mycc",
+	"chaincodeVersion":"v1",
+	"functionName":"init",
+	"chaincodePath":"github.com/uniqueKeyValue",
+	"args":[""],
+	"isupgrade":"true"
+}'
+echo
+echo "GET query chaincode on peer1 of Org1 on mychannel1 on upgradec chaincode mycc v1"
+echo
+curl -s -X GET \
+  "http://localhost:4000/channels/mychannel1/chaincodes/mycc?peer=peer1&args=%5B%22get%22%2C%22org1%22%5D" \
+  -H "authorization: Bearer $ORG1_TOKEN" \
+  -H "content-type: application/json"
+echo
+echo
+printf "\nTotal execution time : $(($(date +%s)-starttime)) secs ...\n\n"

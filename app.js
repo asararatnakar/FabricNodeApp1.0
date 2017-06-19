@@ -227,7 +227,25 @@ app.post('/chaincodes', function(req, res) {
 });
 // Instantiate chaincode on target peers
 app.post('/channels/:channelName/chaincodes', function(req, res) {
-	logger.debug('==================== INSTANTIATE CHAINCODE ==================');
+	var isUpgrade = req.body.isupgrade;
+	var peers;
+	var chaincodePath;
+	if (!isUpgrade){
+		logger.debug('==================== INSTANTIATE CHAINCODE ==================');
+	}else {
+		logger.debug('==================== UPGRADE CHAINCODE ==================');
+		peers = req.body.peers;
+		if (!peers || peers.length == 0) {
+			res.json(getErrorMessage('\'peers\''));
+			return;
+		}
+		chaincodePath = req.body.chaincodePath;
+		if (!chaincodePath) {
+			res.json(getErrorMessage('\'chaincodePath\''));
+			return;
+		}
+	}
+
 	var chaincodeName = req.body.chaincodeName;
 	var chaincodeVersion = req.body.chaincodeVersion;
 	var channelName = req.params.channelName;
@@ -258,10 +276,25 @@ app.post('/channels/:channelName/chaincodes', function(req, res) {
 		res.json(getErrorMessage('\'args\''));
 		return;
 	}
-	instantiate.instantiateChaincode(channelName, chaincodeName, chaincodeVersion, functionName, args, req.username, req.orgname)
-	.then(function(message) {
-		res.send(message);
-	});
+	if (isUpgrade) {
+		install.installChaincode(peers, chaincodeName, chaincodePath, chaincodeVersion, req.username, req.orgname)
+		.then(function(message) {
+			// TODO: Avoid this hardcoding ?
+			if (!message || !message.includes('Successfully Installed chaincode')) {
+				res.send('Chaincode upgarde failed while installing chaincode with version '+chaincodeVersion);
+			}else {
+			instantiate.instantiateChaincode(channelName, chaincodeName, chaincodeVersion, functionName, args, req.username, req.orgname, isUpgrade)
+			.then(function(message) {
+				res.send(message);
+			});
+		}
+		});
+	} else {
+		instantiate.instantiateChaincode(channelName, chaincodeName, chaincodeVersion, functionName, args, req.username, req.orgname)
+		.then(function(message) {
+			res.send(message);
+		});
+	}
 });
 // Invoke transaction on chaincode on target peers
 app.post('/channels/:channelName/chaincodes/:chaincodeName', function(req, res) {
