@@ -6,7 +6,6 @@
    "GOPATH":"../artifacts",
    "keyValueStore":"/tmp/fabric-client-kvs",
    "eventWaitTime":"30000",
-   "invokeQueryFcnName":"invoke",
    "users":[
       {
          "username":"admin",

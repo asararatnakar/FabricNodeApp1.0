@@ -70,25 +70,17 @@ func (t *cryptoChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
 //Invoke implements chaincode's Invoke interface
 func (t *cryptoChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	function, args := stub.GetFunctionAndParameters()
-	if function != "invoke" {
-		return shim.Error("Unknown function call")
-	}
-
-	if len(args) < 2 {
-		return shim.Error(fmt.Sprintf("invalid number of args %d", len(args)))
-	}
-	method := args[0]
-	if method == "put" {
-		if len(args) < 3 {
+	if function == "put" {
+		if len(args) < 2 {
 			return shim.Error(fmt.Sprintf("invalid number of args for put %d", len(args)))
 		}
 		fmt.Println ("\n ############## Invoke ##############\n")
 		return t.writeTransaction(stub, args)
-	} else if method == "get" {
+	} else if function == "get" {
 		fmt.Println ("\n ############## Query ##############\n")
 		return t.readTransaction(stub, args)
 	}
-	return shim.Error(fmt.Sprintf("unknown function %s", method))
+	return shim.Error(fmt.Sprintf("unknown function %s", function))
 }
 
 func (t *cryptoChaincode) encryptAndDecrypt(arg string) []byte {
@@ -159,9 +151,9 @@ func (t *cryptoChaincode) Decrypt(key []byte, ciphertext []byte) []byte {
 
 func (t *cryptoChaincode) writeTransaction(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	fmt.Println ("\n ------------- writeTransaction -------------\n")
-	fmt.Printf ("\n Key => \"%s\" , Value => %s\n", args[1], args[2])
-	cryptoArg := t.encryptAndDecrypt(args[2])
-	err := stub.PutState(args[1], cryptoArg)
+	fmt.Printf ("\n Key => \"%s\" , Value => %s\n", args[0], args[1])
+	cryptoArg := t.encryptAndDecrypt(args[1])
+	err := stub.PutState(args[0], cryptoArg)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -172,11 +164,11 @@ func (t *cryptoChaincode) readTransaction(stub shim.ChaincodeStubInterface, args
 	fmt.Println ("\n ------------- writeTransaction -------------\n")
 
 	// Get the state from the ledger
-	val, err := stub.GetState(args[1])
+	val, err := stub.GetState(args[0])
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	fmt.Printf ("\n Key => \"%s\" , Value => %s\n", args[1], string(val))
+	fmt.Printf ("\n Key => \"%s\" , Value => %s\n", args[0], string(val))
 	return shim.Success(val)
 }
 

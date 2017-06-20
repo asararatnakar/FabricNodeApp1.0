@@ -23,7 +23,7 @@ var config = require('../config.json');
 var helper = require('./helper.js');
 var logger = helper.getLogger('Query');
 
-var queryChaincode = function(peer, channelName, chaincodeName, args, username, org) {
+var queryChaincode = function(peer, channelName, chaincodeName, fcn, args, username, org) {
 	var channel = helper.getChannelForOrg(org, channelName);
 	var client = helper.getClientForOrg(org, channelName);
 	var target = buildTarget(peer, org);
@@ -34,7 +34,7 @@ var queryChaincode = function(peer, channelName, chaincodeName, args, username, 
 		var request = {
 			chaincodeId: chaincodeName,
 			txId: tx_id,
-			fcn: config.functionName,
+			fcn: fcn,
 			args: args
 		};
 		return channel.queryByChaincode(request, target);

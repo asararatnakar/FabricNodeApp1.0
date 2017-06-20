@@ -149,10 +149,14 @@ app.get('/revoke', function(req, res) {
 		}
 	});
 });
-// Create Channel
+// Create/Update Channel
 app.post('/channels', function(req, res) {
-	logger.info('<<<<<<<<<<<<<<<<< C R E A T E  C H A N N E L >>>>>>>>>>>>>>>>>');
-	logger.debug('End point : /channels');
+	var configUpdate = req.body.configUpdate;
+	if (!configUpdate) {
+		logger.info('<<<<<<<<<<<<<<<<< C R E A T E  C H A N N E L >>>>>>>>>>>>>>>>>');
+	} else {
+		logger.info('<<<<<<<<<<<<<<<<< U P D A T E  C H A N N E L >>>>>>>>>>>>>>>>>');
+	}
 	var channelName = req.body.channelName;
 	var channelConfigPath = req.body.channelConfigPath;
 	logger.debug('Channel name : ' + channelName);
@@ -166,7 +170,7 @@ app.post('/channels', function(req, res) {
 		return;
 	}
 
-	channels.createChannel(channelName, channelConfigPath, req.username, req.orgname)
+	channels.createChannel(channelName, channelConfigPath, configUpdate, req.username, req.orgname)
 	.then(function(message) {
 		res.send(message);
 	});
@@ -341,9 +345,11 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', function(req, res) {
 	var chaincodeName = req.params.chaincodeName;
 	let args = req.query.args;
 	let peer = req.query.peer;
+	let fcn = req.query.fcn;
 
 	logger.debug('channelName : ' + channelName);
 	logger.debug('chaincodeName : ' + chaincodeName);
+	logger.debug('fcn  : ' + fcn);
 	logger.debug('args : ' + args);
 
 	if (!chaincodeName) {
@@ -354,6 +360,10 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', function(req, res) {
 		res.json(getErrorMessage('\'channelName\''));
 		return;
 	}
+	if (!fcn) {
+		res.json(getErrorMessage('\'fcn\''));
+		return;
+	}
 	if (!args) {
 		res.json(getErrorMessage('\'args\''));
 		return;
@@ -362,7 +372,7 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', function(req, res) {
 	args = JSON.parse(args);
 	logger.debug(args);
 
-	query.queryChaincode(peer, channelName, chaincodeName, args, req.username, req.orgname)
+	query.queryChaincode(peer, channelName, chaincodeName, fcn, args, req.username, req.orgname)
 	.then(function(message) {
 		res.send(message);
 	});

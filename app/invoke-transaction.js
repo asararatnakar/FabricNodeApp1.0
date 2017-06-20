@@ -40,7 +40,7 @@ var invokeChaincode = function(peersUrls, channelName, chaincodeName, fcn, args,
 		var request = {
 			targets: targets,
 			chaincodeId: chaincodeName,
-			fcn: config.invokeQueryFcnName,
+			fcn: fcn,
 			args: args,
 			chainId: channelName,
 			txId: tx_id
@@ -114,7 +114,7 @@ var invokeChaincode = function(peersUrls, channelName, chaincodeName, fcn, args,
 				});
 				eventPromises.push(txPromise);
 			};
-			
+
 			return Promise.all([sendPromise].concat(eventPromises)).then((results) => {
 				logger.debug(' event promise all complete and testing complete');
 				return results[0]; // the first returned value is from the 'sendPromise' which is from the 'sendTransaction()' call

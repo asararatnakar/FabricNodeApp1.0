@@ -58,7 +58,8 @@ curl -s -X POST \
   -H "content-type: application/json" \
   -d '{
 	"channelName":"mychannel1",
-	"channelConfigPath":"../artifacts/channel/mychannel1.tx"
+	"channelConfigPath":"../artifacts/channel/mychannel1.tx",
+	"configUpdate":false
 }'
 echo
 echo
@@ -194,8 +195,8 @@ TRX_ID=$(curl -s -X POST \
   -H "content-type: application/json" \
   -d '{
 	"peers": ["localhost:7051", "localhost:8051"],
-	"fcn":"invoke",
-	"args":["put","org1","putsomerandomvalue-org1"]
+	"fcn":"put",
+	"args":["org1","putsomerandomvalue-org1"]
 }')
 echo "Transacton ID is $TRX_ID"
 echo
@@ -209,8 +210,8 @@ TRX_ID1=$(curl -s -X POST \
   -H "content-type: application/json" \
   -d '{
 	"peers": ["localhost:9051", "localhost:10051"],
-	"fcn":"invoke",
-	"args":["put","org2","putsomerandomvalue-org2"]
+	"fcn":"put",
+	"args":["org2","putsomerandomvalue-org2"]
 }')
 echo "Transacton ID is $TRX_ID1"
 echo
@@ -219,7 +220,7 @@ echo
 echo "GET query chaincode on peer1 of Org1"
 echo
 curl -s -X GET \
-  "http://localhost:4000/channels/mychannel1/chaincodes/mycc?peer=peer1&args=%5B%22get%22%2C%22org1%22%5D" \
+  "http://localhost:4000/channels/mychannel1/chaincodes/mycc?peer=peer1&fcn=get&args=%5B%22org1%22%5D" \
   -H "authorization: Bearer $ORG1_TOKEN" \
   -H "content-type: application/json"
 echo
@@ -228,7 +229,7 @@ echo
 echo "GET query chaincode on peer1 of Org2"
 echo
 curl -s -X GET \
-  "http://localhost:4000/channels/mychannel1/chaincodes/mycc?peer=peer1&args=%5B%22get%22%2C%22org2%22%5D" \
+  "http://localhost:4000/channels/mychannel1/chaincodes/mycc?peer=peer1&fcn=get&args=%5B%22org2%22%5D" \
   -H "authorization: Bearer $ORG2_TOKEN" \
   -H "content-type: application/json"
 echo
@@ -243,8 +244,8 @@ TRX_ID2=$(curl -s -X POST \
   -H "content-type: application/json" \
   -d '{
 	"peers": ["localhost:7051", "localhost:8051"],
-	"fcn":"invoke",
-	"args":["put","ORG1","putsomerandomvalue-ORG1"]
+	"fcn":"put",
+	"args":["ORG1","putsomerandomvalue-ORG1"]
 }')
 echo "Transacton ID is $TRX_ID2"
 echo
@@ -258,8 +259,8 @@ TRX_ID2=$(curl -s -X POST \
   -H "content-type: application/json" \
   -d '{
 	"peers": ["localhost:9051", "localhost:10051"],
-	"fcn":"invoke",
-	"args":["put","ORG2","putsomerandomvalue-ORG2"]
+	"fcn":"put",
+	"args":["ORG2","putsomerandomvalue-ORG2"]
 }')
 echo "Transacton ID is $TRX_ID2"
 echo
@@ -268,7 +269,7 @@ echo
 echo "GET query chaincode on peer1 of Org1 on mychannel2"
 echo
 curl -s -X GET \
-  "http://localhost:4000/channels/mychannel2/chaincodes/mycc?peer=peer1&args=%5B%22get%22%2C%22ORG1%22%5D" \
+  "http://localhost:4000/channels/mychannel2/chaincodes/mycc?peer=peer1&fcn=get&args=%5B%22ORG1%22%5D" \
   -H "authorization: Bearer $ORG1_TOKEN" \
   -H "content-type: application/json"
 echo
@@ -277,7 +278,7 @@ echo
 echo "GET query chaincode on peer1 of Org2 on mychannel2"
 echo
 curl -s -X GET \
-  "http://localhost:4000/channels/mychannel2/chaincodes/mycc?peer=peer1&args=%5B%22get%22%2C%22ORG2%22%5D" \
+  "http://localhost:4000/channels/mychannel2/chaincodes/mycc?peer=peer1&fcn=get&args=%5B%22ORG2%22%5D" \
   -H "authorization: Bearer $ORG2_TOKEN" \
   -H "content-type: application/json"
 echo
@@ -322,7 +323,6 @@ curl -s -X GET \
   "http://localhost:4000/channels/mychannel1?peer=peer1" \
   -H "authorization: Bearer $ORG1_TOKEN" \
   -H "content-type: application/json"
-echo
 echo
 
 echo "GET query ChainInfo on mychannel2"
@@ -407,7 +407,7 @@ echo
 echo "GET query chaincode on peer1 of Org1 on mychannel1 on upgradec chaincode mycc v1"
 echo
 curl -s -X GET \
-  "http://localhost:4000/channels/mychannel1/chaincodes/mycc?peer=peer1&args=%5B%22get%22%2C%22org1%22%5D" \
+  "http://localhost:4000/channels/mychannel1/chaincodes/mycc?peer=peer1&fcn=get&args=%5B%22org1%22%5D" \
   -H "authorization: Bearer $ORG1_TOKEN" \
   -H "content-type: application/json"
 echo

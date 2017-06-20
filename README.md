@@ -59,12 +59,15 @@ cd FabricNodeApp1.0
 Once the tests are completed, cleanup the network and crypto material using the below command
 
 ```
-./runApp.sh stop
+./runApp.sh -m stop
 ```
 
 **NOTE** : There are two more options available **start** and **restart** (restart is default)
 
 ## Sample REST APIs Requests
+
+**PLEASE NOTE:** these requests are getting changed over time, If things are not working as expected
+Please refer [testAPIs.sh](https://github.com/asararatnakar/FabricNodeApp1.0/blob/master/testAPIs.sh)
 
 ### Login Request
 
@@ -238,11 +241,12 @@ You have the ability to change configuration parameters by editing the network-c
 If you choose to customize your docker-compose yaml file by hardcoding IP Addresses and PORT information for your peers and orderer, then you MUST also add the identical values into the network-config.json file. The paths shown below will need to be adjusted to match your docker-compose yaml file.
 
 ```
-		"orderer": {
+		"orderer": [{
 			"url": "grpcs://x.x.x.x:7050",
 			"server-hostname": "orderer0",
 			"tls_cacerts": "../artifacts/tls/orderer/ca-cert.pem"
 		},
+		{...}],
 		"org1": {
 			"ca": "http://x.x.x.x:7054",
 			"peer1": {
@@ -254,6 +258,10 @@ If you choose to customize your docker-compose yaml file by hardcoding IP Addres
 				"requests": "grpcs://x.x.x.x:8051",
 				"events": "grpcs://x.x.x.x:8053",
 				...
+			},
+			"admin": {
+				"key": ".../org1.example.com/users/Admin@org1.example.com/msp/keystore",
+				"cert": "../org1.example.com/users/Admin@org1.example.com/msp/signcerts"
 			}
 		},
 		"org2": {
@@ -266,6 +274,10 @@ If you choose to customize your docker-compose yaml file by hardcoding IP Addres
 				"requests": "grpcs://x.x.x.x:10051",
 				"events": "grpcs://x.x.x.x:10053",
 				...
+			},
+			"admin": {
+				"key": ".../org2.example.com/users/Admin@org2.example.com/msp/keystore",
+				"cert": "../org2.example.com/users/Admin@org2.example.com/msp/signcerts"
 			}
 		}
 

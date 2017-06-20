@@ -168,7 +168,7 @@ function newRemotes(urls, forPeers, userOrg, channelName) {
 //-------------------------------------//
 // APIs
 //-------------------------------------//
-	var getChannelForOrg = function(org, channelName) {
+var getChannelForOrg = function(org, channelName) {
 	if (channelName == undefined ) {
 		channelName = config.channelsList[0];
 	}

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ##TODO: generate artifacts etc., tedious ?
+##TODO: add debug flag to enable/disable for peer ad orderer
 ## usage message
 function usage () {
   echo "Usage: "
