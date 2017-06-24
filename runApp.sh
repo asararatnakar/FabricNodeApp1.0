@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 ##TODO: generate artifacts etc., tedious ?
 ##TODO: add debug flag to enable/disable for peer ad orderer
@@ -96,9 +96,9 @@ function cleanAndInstall() {
 function installNodeModules() {
         echo
         if [ -d node_modules ]; then
-		npm ls fabric-client && npm ls fabric-ca-client || cleanAndInstall
+		npm ls fabric-client fabric-ca-client || cleanAndInstall
         else
-                cleanAndInstall
+                cleanAndInstall && npm ls fabric-client fabric-ca-client
         fi
         echo
 }

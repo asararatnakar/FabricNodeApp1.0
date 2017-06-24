@@ -4,6 +4,8 @@
 #
 
 version: '2'
+networks:
+  myapp:
 
 services:
   ca.org1.example.com:
@@ -20,6 +22,8 @@ services:
       - "7054:7054"
     volumes:
       - ./crypto-config/peerOrganizations/org1.example.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    networks:
+      - myapp
 
   ca.org2.example.com:
     container_name: ca_peerOrg2
@@ -35,6 +39,8 @@ services:
       - "8054:7054"
     volumes:
       - ./crypto-config/peerOrganizations/org2.example.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    networks:
+      - myapp
 
   zookeeper0:
     container_name: zookeeper0
@@ -44,6 +50,8 @@ services:
     environment:
       - ZOO_MY_ID=1
       - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
+    networks:
+      - myapp
 
   zookeeper1:
     container_name: zookeeper1
@@ -53,6 +61,8 @@ services:
     environment:
       - ZOO_MY_ID=2
       - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
+    networks:
+      - myapp
 
   zookeeper2:
     container_name: zookeeper2
@@ -62,6 +72,8 @@ services:
     environment:
       - ZOO_MY_ID=3
       - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
+    networks:
+      - myapp
 
   kafka0:
     container_name: kafka0
@@ -77,6 +89,8 @@ services:
       - zookeeper0
       - zookeeper1
       - zookeeper2
+    networks:
+      - myapp
 
   kafka1:
     container_name: kafka1
@@ -92,6 +106,8 @@ services:
       - zookeeper0
       - zookeeper1
       - zookeeper2
+    networks:
+      - myapp
 
   kafka2:
     container_name: kafka2
@@ -107,6 +123,8 @@ services:
       - zookeeper0
       - zookeeper1
       - zookeeper2
+    networks:
+      - myapp
 
   kafka3:
     container_name: kafka3
@@ -122,6 +140,8 @@ services:
       - zookeeper0
       - zookeeper1
       - zookeeper2
+    networks:
+      - myapp
 
   orderer0.example.com:
     container_name: orderer0.example.com
@@ -139,6 +159,8 @@ services:
       - kafka1
       - kafka2
       - kafka3
+    networks:
+      - myapp
 
   orderer1.example.com:
     container_name: orderer1.example.com
@@ -156,6 +178,8 @@ services:
       - kafka1
       - kafka2
       - kafka3
+    networks:
+      - myapp
 
   orderer2.example.com:
     container_name: orderer2.example.com
@@ -173,6 +197,8 @@ services:
       - kafka1
       - kafka2
       - kafka3
+    networks:
+      - myapp
 
   peer0.org1.example.com:
     container_name: peer0.org1.example.com
@@ -195,6 +221,8 @@ services:
       - orderer0.example.com
       - orderer1.example.com
       - orderer2.example.com
+    networks:
+      - myapp
 
   peer1.org1.example.com:
     container_name: peer1.org1.example.com
@@ -218,6 +246,8 @@ services:
       - orderer0.example.com
       - orderer1.example.com
       - orderer2.example.com
+    networks:
+      - myapp
 
   peer0.org2.example.com:
     container_name: peer0.org2.example.com
@@ -240,6 +270,8 @@ services:
       - orderer0.example.com
       - orderer1.example.com
       - orderer2.example.com
+    networks:
+      - myapp
 
   peer1.org2.example.com:
     container_name: peer1.org2.example.com
@@ -263,3 +295,5 @@ services:
       - orderer0.example.com
       - orderer1.example.com
       - orderer2.example.com
+    networks:
+      - myapp
