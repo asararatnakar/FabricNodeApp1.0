@@ -73,7 +73,7 @@ function generateChannelArtifacts() {
 }
 
 cd artifacts
-#generateCerts
+generateCerts
 replacePrivateKey
 generateChannelArtifacts
 cd $CURRENT_DIR

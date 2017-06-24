@@ -7,7 +7,7 @@ function usage () {
   echo "Usage: "
   echo "  runApp.sh [-m start|stop|restart] [-t <release-tag>] [-c enable-CouchDB] [-l capture-logs]"
   echo "  runApp.sh -h|--help (print this message)"
-  echo "      -m <mode> - one of 'start', 'stop', 'restart' or 'generate'"
+  echo "      -m <mode> - one of 'start', 'stop', 'restart' " #or 'generate'"
   echo "      - 'start' - bring up the network with docker-compose up & start the app on port 4000"
   echo "      - 'up'    - same as start"
   echo "      - 'stop'  - stop the network with docker-compose down & clear containers , crypto keys etc.,"
@@ -47,11 +47,12 @@ while getopts "h?m:t:cl" opt; do
     l)  ENABLE_LOGS='y'
     ;;
     t)  TAG="$OPTARG"
-	if [ "$TAG" -ne "beta" -o "$TAG" -ne "rc1" ]; then
+	if [ "$TAG" == "beta" -o "$TAG" == "rc1" ]; then
+		##TODO: ensure package.json contains right node packages
+		IMAGE_TAG="`uname -m`-1.0.0-$OPTARG"
+	else 
 		usage
 	fi
-	IMAGE_TAG="`uname -m`-1.0.0-$OPTARG"
-	##TODO: ensure package.json contains right node packages
     ;;
   esac
 done
@@ -103,7 +104,7 @@ function installNodeModules() {
 }
 function checkForDockerImages() {
 	DOCKER_IMAGES=$(docker images | grep "$IMAGE_TAG" | wc -l)
-	if [ $DOCKER_IMAGES -ne 8 ]; then
+	if [ $DOCKER_IMAGES -ne 9 ]; then
 		printf "\n############# You don't have all fabric images, Let me them pull for you ###########\n"
 		for IMAGE in peer orderer ca couchdb ccenv javaenv kafka tools zookeeper; do
 		      docker pull hyperledger/fabric-$IMAGE:$IMAGE_TAG
