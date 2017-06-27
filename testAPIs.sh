@@ -254,7 +254,7 @@ echo
 echo "POST invoke chaincode on peers of Org2 on mychannel2"
 echo
 TRX_ID2=$(curl -s -X POST \
-  http://localhost:4000/channels/mychannel1/chaincodes/mycc \
+  http://localhost:4000/channels/mychannel2/chaincodes/mycc \
   -H "authorization: Bearer $ORG2_TOKEN" \
   -H "content-type: application/json" \
   -d '{
@@ -283,7 +283,6 @@ curl -s -X GET \
   -H "content-type: application/json"
 echo
 echo
-
 printf "\n\n #################### SYSTEM CHAINCODE QUERIES ######################\n\n"
 echo "GET query Block by blockNumber"
 echo
@@ -404,12 +403,31 @@ curl -s -X POST \
 	"isupgrade":"true"
 }'
 echo
-echo "GET query chaincode on peer1 of Org1 on mychannel1 on upgradec chaincode mycc v1"
+echo "POST invoke chaincode on peers of Org1 on upgraded chaincode mycc v1"
+echo
+TRX_ID=$(curl -s -X POST \
+  http://localhost:4000/channels/mychannel1/chaincodes/mycc \
+  -H "authorization: Bearer $ORG1_TOKEN" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["localhost:7051", "localhost:8051"],
+	"fcn":"put",
+	"args":["org1","upgradedvalue-org1"]
+}')
+echo "Transacton ID is $TRX_ID"
+echo "GET query chaincode on peer1 of Org1 on mychannel1 on upgraded chaincode mycc v1"
 echo
 curl -s -X GET \
   "http://localhost:4000/channels/mychannel1/chaincodes/mycc?peer=peer1&fcn=get&args=%5B%22org1%22%5D" \
   -H "authorization: Bearer $ORG1_TOKEN" \
   -H "content-type: application/json"
 echo
+echo
+echo "GET query chaincode on peer2 of Org1 on mychannel1 on upgraded chaincode mycc v1"
+echo
+curl -s -X GET \
+  "http://localhost:4000/channels/mychannel1/chaincodes/mycc?peer=peer2&fcn=get&args=%5B%22org1%22%5D" \
+  -H "authorization: Bearer $ORG1_TOKEN" \
+  -H "content-type: application/json"
 echo
 printf "\nTotal execution time : $(($(date +%s)-starttime)) secs ...\n\n"
