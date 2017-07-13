@@ -1,7 +1,7 @@
 {
-  "name": "balance-transfer",
-  "version": "1.0.0-beta",
-  "description": "A balance-transfer example node program to demonstrate using node.js SDK APIs",
+  "name": "FabricV1.0SampleApp",
+  "version": "1.0.0",
+  "description": "A sample app to demonstrate using node.js SDK APIs",
   "main": "app/app.js",
   "keywords": [
     "fabric-client sample app",
@@ -21,8 +21,8 @@
     "express-bearer-token": "^2.1.0",
     "express-jwt": "^5.1.0",
     "express-session": "^1.15.2",
-    "fabric-ca-client": ">=1.0.0-rc1 <1.0.0-rc1.10",
-    "fabric-client": ">=1.0.0-rc1 <1.0.0-rc1.10",
+    "fabric-ca-client": "^1.0.0",
+    "fabric-client": "^1.0.0",
     "figlet": "^1.2.0",
     "fs-extra": "^2.0.0",
     "jsonwebtoken": "^7.3.0",

@@ -14,6 +14,7 @@ function usage () {
   echo "      - 'down'  - same as stop"
   echo "      - 'restart' -  restarts the network and start the app on port 4000 (Typically stop + start)"
   echo "     -c enable CouchDB"
+  echo "     -r re-Generate the certs and channel artifacts"
   echo "     -l capture docker logs before network teardown"
   echo "     -t <release-tag> - ex: alpha | beta | rc , missing this option will result in using the latest docker images"
   echo
@@ -21,6 +22,7 @@ function usage () {
   echo
   echo "	runApp.sh"
   echo "	runApp.sh -l"
+  echo "	runApp.sh -r"
   echo "	runApp.sh -m restart -t beta"
   echo "	runApp.sh -m start -c"
   echo "	runApp.sh -m stop"
@@ -34,7 +36,7 @@ function usage () {
 }
 
 # Parse commandline args
-while getopts "h?m:t:cl" opt; do
+while getopts "h?m:t:clr" opt; do
   case "$opt" in
     h|\?)
       usage
@@ -46,11 +48,15 @@ while getopts "h?m:t:cl" opt; do
     ;;
     l)  ENABLE_LOGS='y'
     ;;
+    r)  REGENERATE='y'
+    ;;
     t)  TAG="$OPTARG"
+	##TODO: ensure package.json contains right node packages
 	if [ "$TAG" == "beta" -o "$TAG" == "rc1" ]; then
-		##TODO: ensure package.json contains right node packages
 		IMAGE_TAG="`uname -m`-1.0.0-$OPTARG"
-	else 
+	elif [ "$TAG" == "1.0.0" ]; then
+		IMAGE_TAG="`uname -m`-1.0.0"
+	else
 		usage
 	fi
     ;;
@@ -120,7 +126,10 @@ function startApp() {
 		checkForDockerImages
   	fi
 	### Let's not worry about dynamic generation of Org certs and channel artifacts 
-  	#source artifacts/generateArtifacts.sh
+	if [ "$REGENERATE" = "y" ]; then
+		rm -rf ./artifacts/channel/*.block channel/*.tx ./artifacts/crypto-config
+                source artifacts/generateArtifacts.sh
+	fi
 
 	#Launch the network
 	if [ "$COUCHDB" = "y" -o "$COUCHDB" = "Y" ]; then
@@ -154,8 +163,6 @@ function shutdownApp() {
 	printf "\n======================= CLEANINGUP ARTIFACTS ====================\n\n"
 	rm -rf /tmp/hfc-test-kvs_peerOrg* $HOME/.hfc-key-store/ /tmp/fabric-client-kvs_peerOrg*
 
-	### Let's not worry about clearing about Org certs and channel artifacts 
-	#rm -rf ./artifacts/channel/*.block channel/*.tx ./artifacts/crypto-config
 }
 
 #Launch the network using docker compose
