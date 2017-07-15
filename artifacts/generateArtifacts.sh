@@ -1,11 +1,9 @@
-#!/bin/bash 
-#-e
+#!/bin/bash -e
 #
 # Copyright IBM Corp. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-
 
 #set -x
 
@@ -16,11 +14,10 @@ TOTAL_CHANNELS=$2
 echo "Using CHANNEL_NAME prefix as $CHANNEL_NAME"
 ROOT_DIR=$PWD
 export FABRIC_CFG_PATH=$ROOT_DIR/artifacts/config
+ARCH=$(uname -s)
 
-#OS_ARCH=$(echo "$(uname -s|tr '[:upper:]' '[:lower:]'|sed 's/mingw64_nt.*/windows/')-$(uname -m | sed 's/x86_64/amd64/g')" | awk '{print tolower($0)}')
-
-function generateCerts (){
-	CRYPTOGEN=$ROOT_DIR/artifacts/bin/cryptogen
+function generateCerts() {
+	CRYPTOGEN=$ROOT_DIR/artifacts/bin/${ARCH}/cryptogen
 	echo
 	echo "##########################################################"
 	echo "##### Generate certificates using cryptogen tool #########"
@@ -30,29 +27,28 @@ function generateCerts (){
 }
 
 ## docker-compose template to replace private key file names with constants
-function replacePrivateKey () {
-	#ARCH="` uname -s | grep Darwin `"
+function replacePrivateKey() {
 	OPTS="-i"
-	#if [ "$ARCH" = "Darwin" ]; then
-	#	OPTS="-it"
-	#fi
+	if [ "$ARCH" = "Darwin" ]; then
+		OPTS="-it"
+	fi
 
 	cp docker-compose-template.yaml docker-compose.yaml
 
-  	cd crypto-config/peerOrganizations/org1.example.com/ca/
-  	PRIV_KEY=$(ls *_sk)
-  	cd $ROOT_DIR/artifacts
-  	sed $OPTS "s/CA1_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose.yaml
-  	cd crypto-config/peerOrganizations/org2.example.com/ca/
-  	PRIV_KEY=$(ls *_sk)
-  	cd $ROOT_DIR/artifacts
-  	sed $OPTS "s/CA2_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose.yaml
+	cd crypto-config/peerOrganizations/org1.example.com/ca/
+	PRIV_KEY=$(ls *_sk)
+	cd $ROOT_DIR/artifacts
+	sed $OPTS "s/CA1_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose.yaml
+	cd crypto-config/peerOrganizations/org2.example.com/ca/
+	PRIV_KEY=$(ls *_sk)
+	cd $ROOT_DIR/artifacts
+	sed $OPTS "s/CA2_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose.yaml
 }
 
 ## Generate orderer genesis block , channel configuration transaction and anchor peer update transactions
 function generateChannelArtifacts() {
 
-	CONFIGTXGEN=$ROOT_DIR/artifacts/bin/configtxgen
+	CONFIGTXGEN=$ROOT_DIR/artifacts/bin/${ARCH}/configtxgen
 
 	echo "##########################################################"
 	echo "#########  Generating Orderer Genesis block ##############"
@@ -61,8 +57,7 @@ function generateChannelArtifacts() {
 	# named orderer.genesis.block or the orderer will fail to launch!
 	$CONFIGTXGEN -profile TwoOrgsOrdererGenesis -outputBlock ./channel/genesis.block
 
-	for (( i=1; i<=$TOTAL_CHANNELS; i=$i+1 ))
-	do
+	for ((i = 1; i <= $TOTAL_CHANNELS; i = $i + 1)); do
 		echo
 		echo "#################################################################"
 		echo "### Generating channel configuration transaction '$CHANNEL_NAME$i.tx' ###"

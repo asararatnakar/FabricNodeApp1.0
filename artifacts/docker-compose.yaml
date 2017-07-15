@@ -13,9 +13,9 @@ services:
       service: ca
     environment:
       - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
-      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/a536e5bd6604896904fcce7c0341e46389f74b9c164eed2cea4210cb4d2334c9_sk
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/7ba85cb4fa7c4ac9be4c65e38ebacc77daa66e82a8fa1b5052f68cb4012cd639_sk
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/a536e5bd6604896904fcce7c0341e46389f74b9c164eed2cea4210cb4d2334c9_sk
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/7ba85cb4fa7c4ac9be4c65e38ebacc77daa66e82a8fa1b5052f68cb4012cd639_sk
     ports:
       - "7054:7054"
     volumes:
@@ -28,9 +28,9 @@ services:
       service: ca
     environment:
       - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem
-      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/9e0d46513563a481f6182b2bcb5c79d891b734a7b76061202b30439c49da448a_sk
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/4188a9e68a4072c5528cf895b5069412fc679811293a29b5519c0209d6216e1b_sk
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/9e0d46513563a481f6182b2bcb5c79d891b734a7b76061202b30439c49da448a_sk
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/4188a9e68a4072c5528cf895b5069412fc679811293a29b5519c0209d6216e1b_sk
     ports:
       - "8054:7054"
     volumes:
