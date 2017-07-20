@@ -63,7 +63,7 @@ func (t *cryptoChaincode) GenAESKey() ([]byte, error) {
 
 //Init implements chaincode's Init interface
 func (t *cryptoChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	fmt.Println ("\n ############## Init ##############\n")
+	fmt.Println (" ############## Init ##############")
 	return shim.Success(nil)
 }
 
@@ -74,12 +74,13 @@ func (t *cryptoChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		if len(args) < 2 {
 			return shim.Error(fmt.Sprintf("invalid number of args for put %d", len(args)))
 		}
-		fmt.Println ("\n ############## Invoke ##############\n")
+		fmt.Println (" ############## Invoke ##############")
 		return t.writeTransaction(stub, args)
 	} else if function == "get" {
-		fmt.Println ("\n ############## Query ##############\n")
+		fmt.Println (" ############## Query ##############")
 		return t.readTransaction(stub, args)
 	}
+	fmt.Println (" ############## Invalid function ##############")
 	return shim.Error(fmt.Sprintf("unknown function %s", function))
 }
 
@@ -92,7 +93,7 @@ func (t *cryptoChaincode) encryptAndDecrypt(arg string) []byte {
 }
 
 func (t *cryptoChaincode) Encrypt(key []byte, byteArray []byte) []byte {
-
+	fmt.Println (" ############## Encryption ##############")
 	// Create the AES cipher
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -121,7 +122,7 @@ func (t *cryptoChaincode) Encrypt(key []byte, byteArray []byte) []byte {
 }
 
 func (t *cryptoChaincode) Decrypt(key []byte, ciphertext []byte) []byte {
-
+	fmt.Println (" ############## Decrypt ##############")
 	// Create the AES cipher
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -150,8 +151,8 @@ func (t *cryptoChaincode) Decrypt(key []byte, ciphertext []byte) []byte {
 }
 
 func (t *cryptoChaincode) writeTransaction(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	fmt.Println ("\n ------------- writeTransaction -------------\n")
-	fmt.Printf ("\n Key => \"%s\" , Value => %s\n", args[0], args[1])
+	fmt.Println ("------------- writeTransaction/Invoke -------------")
+	fmt.Printf (" Key => \"%s\" , Value => %s", args[0], args[1])
 	cryptoArg := t.encryptAndDecrypt(args[1])
 	err := stub.PutState(args[0], cryptoArg)
 	if err != nil {
@@ -161,14 +162,14 @@ func (t *cryptoChaincode) writeTransaction(stub shim.ChaincodeStubInterface, arg
 }
 
 func (t *cryptoChaincode) readTransaction(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	fmt.Println ("\n ------------- writeTransaction -------------\n")
+	fmt.Println ("------------- readTransaction/Query -------------")
 
 	// Get the state from the ledger
 	val, err := stub.GetState(args[0])
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	fmt.Printf ("\n Key => \"%s\" , Value => %s\n", args[0], string(val))
+	fmt.Printf (" Key => \"%s\" , Value => %s", args[0], string(val))
 	return shim.Success(val)
 }
 

@@ -125,7 +125,7 @@ function startApp() {
 		printf "\n ========= FABRIC IMAGE TAG : $IMAGE_TAG ===========\n"
 		checkForDockerImages
 	fi
-	### dynamic generation of Org certs and channel artifacts 
+	### dynamic generation of Org certs and channel artifacts
 	if [ "$REGENERATE" = "y" ]; then
 		rm -rf ./artifacts/channel/*.block ./artifacts/channel/*.tx ./artifacts/crypto-config
 		source artifacts/generateArtifacts.sh
@@ -160,7 +160,7 @@ function shutdownApp() {
 	docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_WITH_COUCH down
 	dkcl
 	dkrm
-
+	echo y | docker network prune
 	# cleanup the material
 	printf "\n======================= CLEANINGUP ARTIFACTS ====================\n\n"
 	rm -rf /tmp/hfc-test-kvs_peerOrg* $HOME/.hfc-key-store/ /tmp/fabric-client-kvs_peerOrg*
