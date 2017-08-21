@@ -19,7 +19,29 @@ echo
 echo "ORG1 token is $ORG1_TOKEN"
 echo
 
+TIMEOUT=60
+function checkOSNavailability(){
+        local rc=1
+        local starttime=$(date +%s)
+
+        # continue to poll
+        # we either get a successful response, or reach TIMEOUT
+        while test "$(($(date +%s)-starttime))" -lt "$TIMEOUT" -a $rc -ne 0
+        do
+                 sleep 1
+                 printf "\rCheck for Ordering Service availablity ...$(($(date +%s)-starttime)) secs"
+                 docker logs  orderer0.example.com 2>&1 | grep "Start phase completed successfully" > /dev/null
+                 test $? -eq 0 && let rc=0
+        done
+        if [ $rc -ne 0 ]; then
+                printf "\n\nTimeout !!!!! Ordering Service is not available ...\n\n"
+                exit
+        fi
+        printf "\n"
+}
+
 function createchannel(){
+  checkOSNavailability
   echo
   echo "POST request Create channel  ..."
   echo
@@ -83,6 +105,7 @@ function instantiatecc(){
   }'
   echo
 }
+
 VALUE="ABCDEF"
 
 function invokecc(){
@@ -91,13 +114,13 @@ function invokecc(){
   if [ ! -z "$1" ]; then
     VALUE="$1"
   fi
-
+  # \"peers\": [\"localhost:7051\", \"localhost:8051\"],
   TRX_ID=$(curl -s -X POST \
     http://localhost:4000/channels/mychannel1/chaincodes/mycc \
     -H "authorization: Bearer $ORG1_TOKEN" \
     -H "content-type: application/json" \
     -d "{
-	\"peers\": [\"localhost:7051\", \"localhost:8051\"],
+	\"peers\": [\"localhost:7051\"],
 	\"fcn\":\"put\",
 	\"args\":[\"org1\",\"$VALUE\"]
   }")
@@ -117,11 +140,12 @@ function querycc(){
     "http://localhost:4000/channels/mychannel1/chaincodes/mycc?peer=peer1&fcn=get&args=%5B%22org1%22%5D" \
     -H "authorization: Bearer $ORG1_TOKEN" \
   -H "content-type: application/json")
-  printf "\nResponse is : $RESP"
+  printf "Response is : $RESP\n"
   if [ "$RESP" == "$VALUE" ]; then
-    printf "\n=============== TEST PASSED : $RESP ==  $VALUE =============== \n\n"
+    printf "\n=============== PASSED : $RESP ==  $VALUE  =============== \n\n"
   else
-    printf "\n!!!!!!!!!  TEST FAILED : $RESP !=  $VALUE !!!!!!!!!\n\n"
+    printf "\n!!!!!!!!!  FAILED : $RESP !=  $VALUE  !!!!!!!!!\n\n"
+    exit 1
   fi
 }
 
@@ -195,8 +219,8 @@ function allinone(){
   installcc
   instantiatecc
   invokecc
-  querycc
-  sysQueries
+  #querycc
+  # sysQueries
   printf "\nTotal execution time : $(($(date +%s)-starttime)) secs ...\n\n"
 }
 
